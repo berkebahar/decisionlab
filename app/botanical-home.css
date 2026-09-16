@@ -111,3 +111,31 @@
   .botanical-hero .hero-receipt-preview .preview-control p,
   .botanical-hero .hero-receipt-preview .preview-control output { color: CanvasText; }
 }
+
+/* Original procedural rain, behind the content. No video or downloaded assets. */
+.botanical-rain { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.botanical-rain > span {
+  position: absolute; top: -70px; bottom: -70px; width: 1px;
+  opacity: var(--rain-opacity);
+  animation: botanical-rainfall var(--rain-duration) var(--rain-delay) linear infinite;
+}
+.botanical-rain > span::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: var(--rain-length);
+  background: linear-gradient(transparent, #dcebdc); border-radius: 1px;
+  transform: rotate(12deg); transform-origin: bottom;
+}
+@keyframes botanical-rainfall { from { transform: translate3d(24px, 0, 0); } to { transform: translate3d(-24px, 100%, 0); } }
+.botanical-rain[data-paused="true"] > span, .botanical-rain[data-active="false"] > span { animation-play-state: paused; }
+.botanical-hero .product-hero { z-index: 1; padding-bottom: 76px; }
+.rain-toggle {
+  position: absolute; z-index: 2; right: max(16px, calc((100% - 1240px) / 2)); bottom: 14px;
+  min-height: 44px; padding: 8px 16px; border-radius: 999px;
+  border: 1px solid #728c78; background: #17372a; color: #eef3e7;
+  font-size: 12px; cursor: pointer; transition: background 180ms, border-color 180ms;
+}
+.rain-toggle:hover { background: #294d39; border-color: #c9d5b8; }
+.rain-toggle:focus-visible { outline: 3px solid #ead7a9; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce), (forced-colors: active), print {
+  .botanical-rain, .rain-toggle { display: none; }
+  .botanical-rain > span { animation: none; }
+}

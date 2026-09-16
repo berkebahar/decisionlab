@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import "./botanical-home.css";
+import BotanicalRain from "./components/botanical-rain";
 import LandingAtmosphere from "./components/landing-atmosphere";
 import ReceiptPreview from "./products/receipt-preview";
 import CreatorNote from "./components/creator-note";
@@ -16,6 +17,7 @@ export default function Home() {
   return <>
     <section className="botanical-hero" aria-labelledby="hero-heading">
       <div className="botanical-backdrop" aria-hidden="true"><Image src="/images/decisionlab-botanical-hero.webp" alt="" fill sizes="100vw" loading="eager" fetchPriority="high" /></div>
+      <BotanicalRain />
       <div className="hero container product-hero"><LandingAtmosphere />
       <div className="hero-copy"><p className="eyebrow">A considered purchase starts here</p><h1 id="hero-heading">Before you buy it, see what it will really cost.</h1><p className="hero-description">Compare price, ownership, usage, resale value, and the goals your purchase may delay.</p><div className="hero-actions"><Link href="/analyze" className="button-primary">Analyze a product <Icon name="arrow" /></Link><Link href="/compare" className="button-outline">Compare products</Link></div><div className="hero-trust"><span><Icon name="check" size={15} />No account or bank details</span><span><Icon name="check" size={15} />Private to this browser</span></div><p className="hero-assurance">A price tag is only the beginning. Use your own assumptions to see ownership costs and cost per use, then decide what matters to you.</p></div>
       <div className="hero-lab"><div className="botanical-preview-caption"><span>Explore the full picture</span><span>Live example</span></div><ReceiptPreview /></div>

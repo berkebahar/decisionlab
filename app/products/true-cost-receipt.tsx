@@ -1,17 +1,19 @@
 "use client";
-import { useId, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
+import { printReceipt } from "./print-receipt";
 import { analyzeProduct } from "./product-calculations";
 import { formatMoney, formatUnitCost, formatQuantity, type ProductAnalysis } from "./product-model";
 
 export default function TrueCostReceipt({ analysis: a, demo = false, compact = false }: { analysis: ProductAnalysis; demo?: boolean; compact?: boolean }) {
   const r = analyzeProduct(a), heading = useId(), receipt = useRef<HTMLElement>(null);
+  const printCleanup = useRef<(() => void) | null>(null);
+  useEffect(() => () => { printCleanup.current?.(); }, []);
   const money = (n: number) => formatMoney(n, a.currency);
   const optional = (n: number | null, calculated = n) => n === null ? "Unknown · excluded" : money(calculated ?? 0);
   function print() {
     const element = receipt.current; if (!element) return;
-    const details = [...element.querySelectorAll("details")]; const states = details.map(d => d.open);
-    element.classList.add("receipt-print-target"); details.forEach(d => d.open = true);
-    try { window.print(); } finally { element.classList.remove("receipt-print-target"); details.forEach((d,i) => d.open = states[i]); }
+    printCleanup.current?.();
+    printCleanup.current = printReceipt(element);
   }
   return <article ref={receipt} className={`true-receipt ${compact ? "receipt-compact" : ""}`} aria-labelledby={heading}>
     <header className="receipt-heading"><p className="eyebrow">DecisionLab / {demo ? "Fictional demonstration" : "Your estimates"}</p><h2 id={heading}>True Cost Receipt</h2><p>{a.name}{a.model ? ` · ${a.model}` : ""}</p><span>{a.condition} · {a.currency} · {r.months} months planned ownership</span></header>
