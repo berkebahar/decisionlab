@@ -8,6 +8,14 @@ export type Category = typeof categories[number];
 export const conditions = ["new", "used", "refurbished"] as const;
 export type Condition = typeof conditions[number];
 export type GoalContext = { name: string; saved: number; target: number; contribution: number; frequency: "week" | "month" };
+export type ProductScorePreferences = {
+  version: 1;
+  maxNetCost: number | null;
+  maxCostPerUse: number | null;
+  maxOngoingCost: number | null;
+  minMonths: number | null;
+  minUsefulness: number | null;
+};
 export type ProductAnalysis = {
   name: string; model: string; category: Category; customCategory: string; condition: Condition; currency: Currency;
   price: number; tax: number | null; shipping: number | null;
@@ -16,6 +24,7 @@ export type ProductAnalysis = {
   repairs: number | null; resale: number | null;
   purpose: string; replaces: boolean; importance: number; usefulness: number;
   alternative: { name: string; price: number } | null; nextBestUse: string; goal: GoalContext | null;
+  scorePreferences?: ProductScorePreferences;
 };
 export const statuses = ["analyzed", "considering", "bought", "skipped", "postponed"] as const;
 export type ProductStatus = typeof statuses[number];
@@ -37,6 +46,13 @@ const optionalMoney = (v: unknown) => v === null || money(v);
 const rating = (v: unknown) => typeof v === "number" && Number.isInteger(v) && v >= 1 && v <= 5;
 const date = (v: unknown): v is string => typeof v === "string" && !!parseLocalDate(v);
 const timestamp = (v: unknown): v is string => typeof v === "string" && /^\d{4}-\d\d-\d\dT/.test(v) && date(v.slice(0, 10)) && Number.isFinite(Date.parse(v));
+export function isScorePreferences(v: unknown): v is ProductScorePreferences {
+  if (!isObject(v) || v.version !== 1) return false;
+  return [v.maxNetCost, v.maxCostPerUse, v.maxOngoingCost].every(optionalMoney)
+    && (v.minMonths === null || typeof v.minMonths === "number" && Number.isInteger(v.minMonths) && v.minMonths >= 1 && v.minMonths <= 1200)
+    && (v.minUsefulness === null || rating(v.minUsefulness))
+    && [v.maxNetCost, v.maxCostPerUse, v.maxOngoingCost, v.minMonths, v.minUsefulness].some(value => value !== null);
+}
 export function isAnalysis(v: unknown): v is ProductAnalysis {
   if (!isObject(v)) return false;
   return text(v.name, 80, true) && text(v.model, 120) && categories.includes(v.category as Category)
@@ -47,7 +63,8 @@ export function isAnalysis(v: unknown): v is ProductAnalysis {
     && ["week", "month"].includes(v.useFrequency as string) && ["month", "year"].includes(v.subscriptionFrequency as string)
     && text(v.purpose, 500) && typeof v.replaces === "boolean" && rating(v.importance) && rating(v.usefulness)
     && (v.alternative === null || (isObject(v.alternative) && text(v.alternative.name, 80, true) && money(v.alternative.price)))
-    && text(v.nextBestUse, 500) && (v.goal === null || (isObject(v.goal) && text(v.goal.name, 80, true) && money(v.goal.saved) && money(v.goal.target) && v.goal.target > 0 && money(v.goal.contribution) && ["week", "month"].includes(v.goal.frequency as string)));
+    && text(v.nextBestUse, 500) && (v.goal === null || (isObject(v.goal) && text(v.goal.name, 80, true) && money(v.goal.saved) && money(v.goal.target) && v.goal.target > 0 && money(v.goal.contribution) && ["week", "month"].includes(v.goal.frequency as string)))
+    && (v.scorePreferences === undefined || isScorePreferences(v.scorePreferences));
 }
 export function isReview(v: unknown): v is PurchaseReview {
   return isObject(v) && [v.price, v.tax, v.shipping, v.maintenance, v.accessories, v.subscriptions, v.repairs, v.resale].every(optionalMoney)

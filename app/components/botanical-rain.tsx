@@ -7,6 +7,11 @@ export default function BotanicalRain() {
   const [paused, setPaused] = useState(false);
   const rain = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    const page = rain.current?.closest(".editorial-home");
+    page?.setAttribute("data-atmosphere-paused", String(paused));
+    return () => { page?.removeAttribute("data-atmosphere-paused"); };
+  }, [paused]);
+  useEffect(() => {
     const layer = rain.current;
     if (!layer) return;
     let inView = true;
@@ -32,7 +37,7 @@ export default function BotanicalRain() {
       } as CSSProperties} />)}
     </div>
     <button type="button" className="rain-toggle" aria-pressed={paused} onClick={() => setPaused(value => !value)}>
-      {paused ? "Resume rain" : "Pause rain"}
+      {paused ? "Resume atmosphere" : "Pause atmosphere"}
     </button>
   </>;
 }

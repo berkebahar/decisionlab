@@ -123,7 +123,7 @@ export default function ScenarioWorkspace() {
           {storageError && <p className={styles.error} role="status">{storageError}</p>}
         </section>
       </form>
-      <aside className={styles.results} aria-labelledby="scenario-result-heading">
+      <aside className={styles.results} data-pointer-light aria-labelledby="scenario-result-heading">
         <div className={styles.resultTop}><p className={styles.kicker}>LIVE SIMULATION</p><span className={styles.liveDot} aria-hidden="true" /></div>
         <h2 id="scenario-result-heading">A small adjustment.<br />A different arrival.</h2>
         {results ? <>

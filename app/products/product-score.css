@@ -1,0 +1,36 @@
+/* Score is a personal fit summary; neutral presentation avoids a buy/sell signal. */
+.score-settings { padding-bottom: 28px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+.score-settings > .product-helper { margin-block: 12px 22px; }
+.personal-score { border-block: 1px solid var(--border); padding-block: 24px; margin-block: 24px; }
+.personal-score-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.personal-score-heading span { font-size: 16px; font-weight: 600; }
+.personal-score-heading p { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.personal-score-heading strong { font-size: clamp(24px, 3vw, 36px); font-weight: 500; font-variant-numeric: tabular-nums; }
+.personal-score-note, .personal-score details p { font-size: 12px; line-height: 1.7; color: var(--muted); margin-top: 12px; }
+.personal-score summary { font-size: 14px; min-height: 44px; padding-block: 12px; }
+.personal-score dl > div { display: flex; gap: 14px; justify-content: space-between; padding-block: 10px; border-top: 1px solid var(--border); font-size: 14px; }
+.personal-score dt, .personal-score dd { min-width: 0; overflow-wrap: anywhere; }
+.personal-score dd { margin: 0; text-align: right; max-width: 52%; }
+.personal-score dl span { display: block; font-size: 12px; color: var(--muted); margin-top: 4px; }
+@media (max-width: 440px) { .personal-score-heading { align-items: flex-start; flex-direction: column; gap: 8px; } }
+@media print {
+  .receipt-print-target .personal-score { margin: 2mm 0; padding: 1.5mm 0; border-color: #aaa; }
+  .receipt-print-target .personal-score-heading { display: flex; flex-direction: row; align-items: baseline; gap: 3mm; break-inside: avoid; }
+  .receipt-print-target .personal-score-heading span { font-size: 9pt; }
+  .receipt-print-target .personal-score-heading strong { font-size: 15pt; }
+  .receipt-print-target .personal-score p, .receipt-print-target .personal-score dl span { font-size: 9pt; line-height: 1.2; margin: 1mm 0; }
+  .receipt-print-target .personal-score summary { font-size: 9pt; padding: 1mm 0; break-after: avoid; }
+  .receipt-print-target .personal-score dl > div { font-size: 9pt; padding: .5mm 0; break-inside: avoid; }
+  .receipt-print-target .personal-score dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0 5mm; margin: 0; }
+  .receipt-print-target .personal-score dl > div { gap: 2mm; }
+  .receipt-print-target .personal-score dd { max-width: 46%; }
+  .receipt-print-target .personal-score dl span { margin: 0; line-height: 1.1; }
+  .receipt-print-target .personal-score dl > div { line-height: 1.1; }
+  .receipt-print-target:has(.personal-score) .receipt-results { padding-block: 1mm; }
+  .receipt-print-target:has(.personal-score) .receipt-assumptions p { line-height: 1.1; }
+  .receipt-print-target .personal-score summary { display: block; list-style: none; }
+  .receipt-print-target:has(.personal-score) .receipt-lines > div { padding-block: .3mm; }
+  .receipt-print-target:has(.personal-score) .receipt-lines { padding-block: 1mm; }
+  .receipt-print-target:has(.personal-score) .receipt-assumptions p { margin-top: .5mm; line-height: 1.1; }
+  .receipt-print-target:has(.personal-score) .receipt-note { margin-block: 1mm; }
+}

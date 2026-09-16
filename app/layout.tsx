@@ -3,6 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./polish.css";
 import "./products/products.css";
+import "./products/product-score.css";
+import "./pointer-light.css";
+import "./editorial-workspaces.css";
+import "./products/receipt-interactions.css";
+import "./interaction-polish.css";
+import PointerLight from "./components/pointer-light";
 import SiteNavigation from "./components/site-navigation";
 import SiteFooter from "./components/site-footer";
 
@@ -35,6 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteNavigation />
         <main id="main" tabIndex={-1}>{children}</main>
         <SiteFooter />
+        <PointerLight />
       </body>
     </html>
   );

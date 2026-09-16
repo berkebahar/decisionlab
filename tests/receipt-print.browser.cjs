@@ -15,7 +15,7 @@ const compile = source => ts.transpileModule(source, { compilerOptions: { module
 for (const extension of ['.ts', '.tsx']) require.extensions[extension] = (module, filename) => module._compile(compile(readFileSync(filename, 'utf8')), filename);
 const Receipt = require('../app/products/true-cost-receipt.tsx').default;
 const { demoGroups } = require('../app/products/demo-products.ts');
-const css = ['app/globals.css', 'app/polish.css', 'app/products/products.css', 'app/botanical-home.css'].map(path => readFileSync(resolve(path), 'utf8')).join('\n').replace('@import "tailwindcss";', '');
+const css = ['app/globals.css', 'app/polish.css', 'app/products/products.css', 'app/products/product-score.css', 'app/products/receipt-interactions.css', 'app/interaction-polish.css', 'app/editorial-workspaces.css', 'app/botanical-home.css', 'app/editorial-home.css', 'app/atmospheric-home.css', 'app/editorial-story.css', 'app/pointer-light.css'].map(path => readFileSync(resolve(path), 'utf8')).join('\n').replace('@import "tailwindcss";', '');
 const helper = compile(readFileSync('app/products/print-receipt.ts', 'utf8'));
 const artifacts = mkdtempSync(join(tmpdir(), 'decisionlab-print-review-'));
 const chrome = process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -49,6 +49,7 @@ function send(method, params = {}, sessionId) {
   const base = demoGroups[0].products[0];
   const variants = [
     ['standard', base],
+    ['personal-score', { ...base, scorePreferences: { version: 1, maxNetCost: 1400, maxCostPerUse: 2, maxOngoingCost: 500, minMonths: 36, minUsefulness: 4 } }],
     ['goal-and-alternative', { ...base, goal: { name: 'Travel fund', target: 3000, saved: 500, contribution: 100, frequency: 'month' }, alternative: { name: 'Refurbished option', price: 600 } }],
     ['unknown-zero-uses', { ...base, uses: 0, tax: null, shipping: null, repairs: null, maintenanceYearly: null, resale: 99999 }],
     ['long-inputs', { ...base, name: 'Long product name '.repeat(4), model: 'Model description '.repeat(6), purpose: 'A practical everyday purchase. '.repeat(16), nextBestUse: 'Keep the money for another priority. '.repeat(13) }],
@@ -76,6 +77,7 @@ function send(method, params = {}, sessionId) {
     assert.equal(status.unrelated, 0); assert.equal(status.buttons, 0); assert.equal(status.detailsOpen, true); assert.equal(status.originalUnchanged, true);
     assert.equal(status.rect.x, 0); assert.equal(status.rect.y, 0);
     for (const label of ['True Cost Receipt', 'Ownership expenses', 'Expected resale deduction', 'Estimated cost per use', 'Assumptions, missing inputs & formulas', 'Next-best use:']) assert.ok(status.text.includes(label), label);
+    if (analysis.scorePreferences) { assert.ok(status.text.includes('User-specific product score')); assert.ok(status.text.includes('Score breakdown & method')); assert.ok(status.text.includes('Each selected factor has equal weight')); }
     if (analysis.goal) assert.ok(status.text.includes('Travel fund'));
     if (name === 'unknown-zero-uses') assert.ok(status.text.includes('Not available'));
     if (name === 'standard' && paper === 'A4') {

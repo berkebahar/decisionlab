@@ -31,26 +31,46 @@ export default function LandingAtmosphere() {
     motion.addEventListener("change", reset);
     pointer.addEventListener("change", reset);
 
-    // Content starts fully visible. These one-shot flourishes never gate access.
-    const animations = new Set<Animation>();
+    // Only decorative layers move. Text and controls never wait for an observer.
+    const animations = new Map<Element, Animation>();
+    const seen = new WeakSet<Element>();
+    const cancel = (target: Element) => { animations.get(target)?.cancel(); animations.delete(target); };
+    const stopAnimations = () => { animations.forEach(animation => animation.cancel()); animations.clear(); };
+    const isAmbient = (layer: Element) => ["foliage", "typography"].includes(layer.getAttribute("data-atmosphere-reveal") ?? "");
     const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(entries => {
       for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        observer?.unobserve(entry.target);
-        if (motion.matches && typeof entry.target.animate === "function") {
-          const animation = entry.target.animate([{ opacity: .96 }, { opacity: 1 }], { duration: 220, easing: "ease-out" });
-          animations.add(animation);
-          animation.onfinish = () => animations.delete(animation);
+        if (isAmbient(entry.target)) {
+          entry.target.setAttribute("data-ambient-active", String(entry.isIntersecting));
+          continue;
         }
+        if (!entry.isIntersecting) { cancel(entry.target); continue; }
+        if (seen.has(entry.target) || !motion.matches || document.hidden || typeof entry.target.animate !== "function") continue;
+        seen.add(entry.target);
+        const paper = entry.target.getAttribute("data-atmosphere-reveal") === "paper";
+        const animation = entry.target.animate(paper
+          ? [{ transform: "translateY(-7px)", opacity: .55 }, { transform: "translateY(0)", opacity: 1 }]
+          : [{ transform: "translate(-12px, 6px) rotate(-2deg)" }, { transform: "translate(0, 0) rotate(0deg)" }],
+        { duration: paper ? 700 : 4200, easing: "cubic-bezier(.2,.65,.3,1)" });
+        animations.set(entry.target, animation);
+        animation.onfinish = () => animations.delete(entry.target);
       }
     }, { threshold: .1 });
-    document.querySelectorAll(".tools-section, .opportunity-section, .creator-section").forEach(section => observer?.observe(section));
-    const stopAnimations = () => { if (!motion.matches) { animations.forEach(animation => animation.cancel()); animations.clear(); } };
+    const page = hero.closest(".editorial-home");
+    page?.querySelectorAll("[data-atmosphere-reveal]").forEach(layer => {
+      if (isAmbient(layer)) layer.setAttribute("data-ambient", "true");
+      observer?.observe(layer);
+    });
+    const visibility = () => { page?.setAttribute("data-atmosphere-hidden", String(document.hidden)); stopAnimations(); };
+    visibility();
     motion.addEventListener("change", stopAnimations);
+    document.addEventListener("visibilitychange", visibility);
+    window.addEventListener("beforeprint", stopAnimations);
     return () => {
-      reset(); observer?.disconnect(); animations.forEach(animation => animation.cancel());
+      reset(); observer?.disconnect(); stopAnimations();
       hero.removeEventListener("pointermove", move); hero.removeEventListener("pointerleave", reset);
       motion.removeEventListener("change", reset); motion.removeEventListener("change", stopAnimations); pointer.removeEventListener("change", reset);
+      document.removeEventListener("visibilitychange", visibility); window.removeEventListener("beforeprint", stopAnimations);
+      page?.querySelectorAll("[data-ambient]").forEach(layer => { layer.removeAttribute("data-ambient"); layer.removeAttribute("data-ambient-active"); });
     };
   }, []);
   return <svg ref={art} className="hero-atmosphere" viewBox="0 0 1200 600" fill="none" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid slice">

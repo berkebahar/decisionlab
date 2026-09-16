@@ -8,13 +8,35 @@ DecisionLab is a private pre-purchase decision platform for anyone evaluating ph
 
 ## Product experience
 
-- `/analyze`: guided Product → Ownership → Purpose → Optional goal steps; generate an accessible, printable True Cost Receipt without bank details or required savings information.
+- `/analyze`: guided Product → Ownership → Purpose → Financial context → Receipt steps; generate an accessible, printable True Cost Receipt without bank details or required savings information.
 - `/compare`: up to three products; enter manually, load analyses, duplicate/edit variants, select factors to display, and inspect differences in assumptions. No universal winner or scientific weighting score.
 - `/queue`: save receipts, edit assumptions, choose tomorrow/3 days/7 days/custom reconsideration dates, and record considering/bought/skipped/postponed with a reason. Reminders appear only on return, with no notifications.
 - `/purchases`: actual purchase date/price, tax/shipping, cumulative costs, uses, satisfaction, buy-again answer, lifecycle, resale and reflection. Original predicted assumptions freeze when marked bought.
 - `/insights`: product models, queue states, self-reported purchases, and reviews are separated. Category counts, planned reconsideration intervals, satisfaction samples, and predicted/actual comparisons use only recorded evidence. No inferred savings or combined hypothetical delay.
 - `/`: interactive receipt preview and fictional laptop, shoes, and camera demonstrations. Demo data stays outside storage unless explicitly adopted and saved.
 - `/about`: transparent assumptions, privacy, and creator information.
+
+## Personal product score
+
+An optional **user-specific product score** measures fit against limits you enter in Financial context: maximum net ownership cost, maximum cost per use, maximum whole-period ongoing costs, minimum ownership months, and minimum usefulness. Blank limits are excluded; at least one limit is required. There are no invented budget defaults.
+
+Each selected factor receives equal weight. Cost fit is 100% within the maximum; above it, maximum / estimate × 100. Ownership and usefulness fit are estimate / minimum × 100, capped at 100%. The displayed total averages unrounded factor scores and rounds once. Missing inputs needed by any selected factor leave the total incomplete; zero uses cannot produce a cost-per-use score. Zero monetary limits are valid. Selecting multiple cost factors gives cost more influence, which is disclosed in the receipt.
+
+This percentage is a personal fit index, **not a probability that you should buy, an affordability approval, or a verified quality/durability rating**. The receipt displays the limits, estimates, factor scores, and exact method. Existing financial formulas are unchanged. Optional version-1 `scorePreferences` travels with the existing product analysis in local storage and backups; old records remain valid without it, and original purchase snapshots remain frozen.
+
+## Editorial presentation
+
+The homepage uses five sections: a cinematic botanical hero, live receipt, simple comparison, reconsideration, and explicitly fictional post-purchase reflection. Supporting tools and creator content remain available. A subtle mouse-following light is limited to selected forest surfaces; it never intercepts clicks and is disabled for touch and reduced motion. There is no custom cursor or continuous light-animation loop. Original CSS rain retains its pause control.
+
+See [the editorial polish handoff](docs/EDITORIAL_POLISH.md) for files, checks, and manual review limits.
+
+## Distinctive interactions
+
+The hero includes a native, keyboard/touch-accessible hidden-cost reveal: fictional $899 sticker price + $120 accessories + $180 maintenance + $240 subscriptions − $310 resale = $1,129 net ownership cost, or $2.17 across 520 expected uses. These figures use the existing calculation functions and never enter personal storage.
+
+Receipt rows offer inline explanations and a short, readable entrance sequence. Calculated values settle immediately into their current value rather than counting through fabricated intermediate amounts. Compare can emphasize cost per use, true cost, price, resale, ongoing costs, usage, or goal impact while keeping its supporting filters and assumptions.
+
+Reduced-motion users get static presentation. Native disclosures still work without animation, and the hero disclosure works without JavaScript. Print snapshots omit interactive row controls and their duplicate hints; all original receipt values and full assumptions remain static and visible. See [the interaction polish review](docs/INTERACTION_POLISH.md) for the exact files, checks, and manual checklist.
 
 ## Preserved supporting tools
 

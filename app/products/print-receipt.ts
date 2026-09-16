@@ -10,7 +10,7 @@ export function printReceipt(receipt: HTMLElement): () => void {
     for (const attribute of ["id", "aria-labelledby", "aria-describedby", "aria-live"]) element.removeAttribute(attribute);
   }
   copy.querySelectorAll("details").forEach(details => { details.open = true; });
-  copy.querySelectorAll("button").forEach(button => button.remove());
+  copy.querySelectorAll("button, [data-print-omit]").forEach(control => control.remove());
   root.append(copy);
   document.body.append(root);
   document.body.classList.add("receipt-printing");

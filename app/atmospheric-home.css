@@ -1,0 +1,109 @@
+/* Original botanical shadows and paper edges. Scoped to Home, never utility pages. */
+.editorial-home .botanical-shade { position: absolute; inset: 0; overflow: hidden; pointer-events: none; user-select: none; }
+.editorial-home .botanical-shade svg { position: absolute; right: -40px; top: -24px; width: min(680px, 74vw); height: auto; transform-origin: 90% 15%; }
+.editorial-home .botanical-shade-stem { stroke: currentColor; stroke-width: 1.5; }
+.editorial-home .botanical-shade-leaves { fill: currentColor; }
+.editorial-home .botanical-shade-hero { z-index: 0; color: #091b12; opacity: .5; }
+.editorial-home .botanical-shade-hero svg { width: min(880px, 88vw); }
+
+/* Forest dissolves at the edge; the reading surface remains opaque and calm. */
+.editorial-home .editorial-receipt-section { position: relative; isolation: isolate; background: linear-gradient(#12271c, transparent 64px), var(--surface-soft); }
+.editorial-home .editorial-receipt-section::after { content: ""; position: absolute; z-index: -1; inset: auto 0 0; height: 64px; background: linear-gradient(transparent, var(--background)); pointer-events: none; }
+.editorial-home .botanical-shade-receipt { z-index: -1; height: 240px; color: #365341; opacity: .08; }
+.editorial-home .botanical-shade-receipt svg { top: -90px; right: auto; left: -110px; width: 580px; }
+:root[data-theme="dark"] .editorial-home .botanical-shade-receipt { color: #c1cdb1; opacity: .055; }
+.editorial-home .editorial-live-receipt { position: relative; isolation: isolate; margin-bottom: 14px; }
+.editorial-home .receipt-paper-layers { position: absolute; z-index: -1; inset: auto 12px -8px; height: 58%; border: 1px solid #cac7b7; background: #ede9de; box-shadow: 0 12px 24px -18px #17221e50; pointer-events: none; }
+.editorial-home .receipt-paper-layers::after { content: ""; position: absolute; z-index: -1; inset: 8px 7px -6px; border: 1px solid #cac7b7; background: #e5e0d2; }
+
+/* The revealed numbers resolve into a physical, readable ivory statement. */
+.editorial-home .hidden-cost-breakdown { position: relative; isolation: isolate; margin-top: 6px; padding: 8px 20px 20px; background: #f7f4ed; color: #17221e; border: 1px solid #d3d1c2; border-top: 2px solid #b59a64; box-shadow: 0 14px 28px -20px #0009; }
+.editorial-home .hidden-cost-breakdown::after { content: ""; position: absolute; top: 0; right: 0; width: 22px; height: 22px; background: linear-gradient(45deg, #e5decb 49%, #f7f4ed 51%); pointer-events: none; transform-origin: top right; }
+.editorial-home .hidden-cost-breakdown :is(dt, .hidden-cost-total > span, .hidden-cost-per-use > span, .hidden-cost-assumptions) { color: #536057; }
+.editorial-home .hidden-cost-breakdown dd { color: #17221e; }
+.editorial-home .hidden-cost-breakdown :is(.hidden-cost-resale dd, .hidden-cost-per-use > strong, .hidden-cost-total > strong) { color: #123c32; }
+.editorial-home .hidden-cost-breakdown .hidden-cost-total { border-color: #c9c9ba; }
+.editorial-home .hidden-cost-breakdown .hidden-cost-assumptions { border-top: 1px solid #d8d8cc; padding-top: 12px; }
+
+/* A quiet foliage echo links the comparison, pause, and reflection sections. */
+.editorial-home .editorial-queue { background: linear-gradient(var(--background), transparent 48px, transparent calc(100% - 48px), var(--background)), #123c32; }
+.editorial-home .botanical-shade-queue { z-index: -1; color: #091f17; opacity: .28; }
+.editorial-home .botanical-shade-queue svg { top: auto; bottom: -100px; right: -70px; }
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  .editorial-home .hidden-cost-reveal[open] .hidden-cost-breakdown::after { animation: paper-corner-settle 600ms ease-out; }
+  @keyframes paper-corner-settle { from { transform: translateY(-5px) scale(.8); opacity: .4; } to { transform: translateY(0) scale(1); opacity: 1; } }
+}
+@media (max-width: 760px) {
+  .editorial-home .botanical-shade-hero svg { width: 480px; right: -190px; }
+  .editorial-home .botanical-shade-receipt svg { width: 400px; left: -150px; }
+  .editorial-home .botanical-shade-queue { opacity: .18; }
+  .editorial-home .editorial-receipt-section { background: linear-gradient(#12271c, transparent 40px), var(--surface-soft); }
+  .editorial-home .editorial-queue { background: linear-gradient(var(--background), transparent 32px, transparent calc(100% - 32px), var(--background)), #123c32; }
+  .editorial-home .hidden-cost-breakdown { padding-inline: 16px; }
+  .editorial-home .hidden-cost-breakdown .hidden-cost-total { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .editorial-home .hidden-cost-breakdown::after { animation: none; }
+}
+@media (forced-colors: active) {
+  .editorial-home :is(.botanical-shade, .receipt-paper-layers),
+  .editorial-home .hidden-cost-breakdown::after { display: none; }
+  .editorial-home .hidden-cost-breakdown { background: Canvas; color: CanvasText; border-color: CanvasText; box-shadow: none; }
+  .editorial-home .hidden-cost-breakdown :is(dt, dd, span, strong, p) { color: CanvasText; border-color: CanvasText; }
+}
+@media print {
+  .editorial-home :is(.botanical-shade, .receipt-paper-layers),
+  .editorial-home .editorial-receipt-section::after,
+  .editorial-home .hidden-cost-breakdown::after { display: none; }
+  .editorial-home .hidden-cost-breakdown { box-shadow: none; animation: none; }
+}
+
+/* A decorative type ribbon sits behind the explorer; real figures stay still.
+   Observe the clipped wrapper, never the moving track, to avoid visibility churn. */
+.editorial-home .lifecycle-ambient-type {
+  position: absolute; z-index: -1; inset: 8px 0 auto; overflow: clip;
+  pointer-events: none; user-select: none; opacity: .08; color: #dccb9f;
+  font-family: var(--font-editorial); font-size: clamp(44px, 8vw, 112px);
+  line-height: 1; letter-spacing: -.035em;
+}
+.editorial-home .lifecycle-type-track { display: flex; width: max-content; }
+.editorial-home .lifecycle-type-track > span { flex: none; white-space: nowrap; }
+
+/* Slow ambient layers share the existing atmosphere pause control. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  .editorial-home .lifecycle-ambient-type[data-ambient="true"] .lifecycle-type-track {
+    animation: lifecycle-type-drift 90s linear infinite;
+    animation-play-state: paused;
+  }
+  .editorial-home .lifecycle-ambient-type[data-ambient-active="true"] .lifecycle-type-track { animation-play-state: running; }
+  .editorial-home[data-atmosphere-paused="true"] .lifecycle-ambient-type .lifecycle-type-track,
+  .editorial-home[data-atmosphere-hidden="true"] .lifecycle-ambient-type .lifecycle-type-track { animation-play-state: paused; }
+  @keyframes lifecycle-type-drift { to { transform: translate3d(-50%, 0, 0); } }
+  .editorial-home .botanical-shade svg[data-ambient="true"] {
+    --sway-x: 14px; --sway-y: 7px;
+    animation: botanical-ambient-sway 24s ease-in-out infinite alternate;
+    animation-play-state: paused;
+  }
+  .editorial-home .botanical-shade-receipt svg[data-ambient="true"] { animation-duration: 31s; animation-direction: alternate-reverse; }
+  .editorial-home .botanical-shade-queue svg[data-ambient="true"] { animation-duration: 37s; }
+  .editorial-home .story-foreground svg[data-ambient="true"] { animation-duration: 28s; }
+  .editorial-home .botanical-shade svg[data-ambient-active="true"] { animation-play-state: running; }
+  .editorial-home[data-atmosphere-paused="true"] .botanical-shade svg,
+  .editorial-home[data-atmosphere-hidden="true"] .botanical-shade svg { animation-play-state: paused; }
+  @keyframes botanical-ambient-sway {
+    from { transform: translate3d(0, 0, 0) rotate(-1deg); }
+    to { transform: translate3d(var(--sway-x), var(--sway-y), 0) rotate(1deg); }
+  }
+}
+@media screen and (max-width: 760px) {
+  .editorial-home .botanical-shade svg[data-ambient="true"] { --sway-x: 6px; --sway-y: 3px; }
+  .editorial-home .lifecycle-ambient-type { opacity: .06; }
+}
+@media (prefers-reduced-motion: reduce), (forced-colors: active), print {
+  .editorial-home .botanical-shade svg[data-ambient="true"] { animation: none; }
+  .editorial-home .lifecycle-ambient-type[data-ambient] .lifecycle-type-track { animation: none; transform: none; }
+}
+@media (forced-colors: active), print {
+  .editorial-home .lifecycle-ambient-type { display: none; }
+}

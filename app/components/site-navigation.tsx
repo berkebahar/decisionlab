@@ -23,7 +23,10 @@ export default function SiteNavigation() {
     if (!nav || !line) return;
     const position = () => {
       const active = nav.querySelector<HTMLElement>('[aria-current="page"]');
-      if (!active || !nav.offsetWidth) return;
+      if (!active || !nav.offsetWidth) {
+        delete line.dataset.ready;
+        return;
+      }
       line.style.width = `${active.offsetWidth - 24}px`;
       line.style.transform = `translateX(${active.offsetLeft + 12}px)`;
       line.dataset.ready = "true";
@@ -53,9 +56,9 @@ export default function SiteNavigation() {
     </nav>
     <dialog ref={drawer} className="mobile-drawer" id="mobile-navigation" aria-label="Navigation menu" onCancel={() => setOpen(false)} onClose={() => { setOpen(false); toggle.current?.focus(); }} onClick={(event) => { if (event.target === event.currentTarget) close(); }}>
       <div className="drawer-content"><div className="drawer-heading"><span className="brand"><BrandMark />DecisionLab</span><button autoFocus className="icon-button" type="button" aria-label="Close navigation menu" onClick={close}><Icon name="close" /></button></div>
-        <p className="eyebrow">YOUR DECISION WORKSPACE</p>
+        <p className="eyebrow">Your decision workspace</p>
         <nav aria-label="Mobile navigation">{pages.map(([href, label], index) => <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined} onClick={close}><span className="nav-index">0{index + 1}</span>{label}<Icon name="arrow" size={18} /></Link>)}</nav>
-        <div className="support-links"><Link href="/dashboard">Goals & legacy decisions</Link><Link href="/goallens">GoalLens</Link><Link href="/simulator">Advanced Simulator</Link></div><div className="drawer-note"><Icon name="target" /><p>Small decisions.<br /><strong>More possibilities.</strong></p></div>
+        <div className="support-links"><Link href="/dashboard" onClick={close}>Goals & legacy decisions</Link><Link href="/goallens" onClick={close}>GoalLens</Link><Link href="/simulator" onClick={close}>Advanced Simulator</Link></div><div className="drawer-note"><Icon name="target" /><p>Small decisions.<br /><strong>More possibilities.</strong></p></div>
         <p className="drawer-credit">Created, designed, and developed by Berke Bahar.</p>
       </div>
     </dialog>

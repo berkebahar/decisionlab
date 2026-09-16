@@ -1,0 +1,31 @@
+/* This is screen presentation only; the independent receipt print stays intact. */
+@media screen {
+  .comparison-focus-picker {
+    display: grid; grid-template-columns: minmax(220px, 360px) minmax(0, 1fr);
+    align-items: end; gap: 22px 36px; padding-block: 14px 22px;
+  }
+  .comparison-focus-picker > p { max-width: 54ch; margin-bottom: 7px; color: var(--muted); font-size: 14px; }
+  .comparison-focus-picker .product-field label { color: var(--foreground); }
+  .comparison-focus-picker select { background: var(--surface); }
+  .comparison-primary-metric { margin-block: 28px 12px; padding-block: 22px; border-block: 1px solid var(--border); min-width: 0; }
+  .comparison-primary-metric dt { color: var(--muted); font-size: 14px; line-height: 1.6; }
+  .comparison-primary-metric dd { margin: 12px 0 0; min-width: 0; font-size: clamp(32px, 3.6vw, 46px); font-weight: 500; line-height: 1.2; letter-spacing: -.035em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .comparison-primary-metric dd[data-available="false"] { font-size: clamp(25px, 2.6vw, 34px); letter-spacing: -.02em; }
+  .comparison-primary-metric .comparison-metric-detail { margin-top: 14px; color: var(--muted); font-size: 13px; font-weight: 400; line-height: 1.75; letter-spacing: 0; }
+  /* The chosen measure has hierarchy; the existing breakdown stays complete. */
+  .comparison-workspace .comparison-product .product-metrics .emphasized { margin-block: 0; border: 0; }
+  .comparison-workspace .comparison-product .product-metrics .emphasized dd { font-size: 22px; line-height: 1.45; letter-spacing: -.01em; }
+}
+@media screen and (max-width: 760px) {
+  .comparison-focus-picker { grid-template-columns: 1fr; gap: 10px; }
+  .comparison-focus-picker > p { margin-bottom: 0; }
+  .comparison-primary-metric { margin-top: 24px; padding-block: 20px; }
+  .comparison-primary-metric dd { font-size: clamp(32px, 9vw, 42px); }
+}
+@media screen and (prefers-reduced-motion: no-preference) {
+  .comparison-primary-metric > div { animation: comparison-metric-settle 200ms ease-out; }
+  @keyframes comparison-metric-settle { from { transform: translateY(3px); opacity: .85; } to { transform: translateY(0); opacity: 1; } }
+}
+@media screen and (prefers-reduced-motion: reduce) {
+  .comparison-primary-metric > div { animation: none; }
+}

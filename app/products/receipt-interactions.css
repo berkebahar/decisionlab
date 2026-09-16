@@ -1,0 +1,45 @@
+/* Values are present in the initial markup. Motion never gates understanding. */
+.receipt-print-label { display: none; }
+.receipt-line-trigger {
+  display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 44px; padding: 4px 0; border: 0; background: transparent;
+  color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.receipt-line-help-icon { display: inline-grid; place-items: center; flex: 0 0 18px; width: 18px; height: 18px; border: 1px solid #869080; border-radius: 50%; color: #536057; font-size: 12px; }
+.receipt-line-trigger:hover .receipt-line-help-icon, .receipt-line-trigger[aria-expanded="true"] .receipt-line-help-icon { color: #f7f4ed; background: #123c32; border-color: #123c32; }
+.receipt-line-explanation { display: block; margin: 3px 0 8px; color: var(--muted); font-size: 12px; line-height: 1.65; max-width: 48ch; }
+.receipt-line-explanation[hidden] { display: none; }
+.true-receipt .receipt-lines > .receipt-line { align-items: center; }
+.true-receipt .receipt-line dt { flex: 1; }
+.true-receipt .receipt-line dd { flex-shrink: 0; }
+@media screen {
+  .true-receipt .receipt-line:has(.receipt-line-trigger[aria-expanded="true"]) { align-items: flex-start; }
+  .true-receipt .receipt-line:has(.receipt-line-trigger[aria-expanded="true"]) dd { padding-top: 12px; }
+}
+.true-receipt .receipt-offset { border-bottom: 1px solid var(--border); }
+.true-receipt .receipt-offset dt, .true-receipt .receipt-offset dd { color: var(--blue); }
+.true-receipt .receipt-results strong .receipt-amount { display: inline-block; font: inherit; color: inherit; letter-spacing: inherit; }
+.true-receipt .receipt-per-use { border-left: 1px solid var(--border); padding-left: 20px; }
+@media screen {
+  .true-receipt:not(.receipt-compact) .receipt-lines > .receipt-line { padding-block: 3px; }
+  .true-receipt .receipt-results { position: relative; }
+  .true-receipt .receipt-results::before { content: ""; display: block; position: absolute; inset: 0 0 auto; height: 1px; background: linear-gradient(90deg, var(--champagne), var(--border)); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .receipt-amount { animation: receipt-value-settle 260ms ease-out; }
+  .receipt-line-explanation:not([hidden]) { animation: receipt-help-open 180ms ease-out; }
+}
+@keyframes receipt-value-settle { from { opacity: .88; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes receipt-help-open { from { opacity: .9; transform: translateY(-2px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 440px) {
+  .true-receipt:not(.receipt-compact) .receipt-per-use { padding-left: 0; padding-top: 12px; border-left: 0; border-top: 1px solid var(--border); }
+  .true-receipt.receipt-compact .receipt-per-use { padding-left: 12px; }
+}
+@media print {
+  .receipt-print-target .receipt-print-label { display: inline !important; }
+  .receipt-print-target .receipt-line-explanation, .receipt-print-target .receipt-line-trigger { display: none !important; }
+  .receipt-print-target .receipt-line dd { flex: 0 1 auto; }
+  .receipt-print-target .receipt-per-use { border: 0; padding: 0; }
+  .receipt-print-target .receipt-results strong .receipt-amount { font: inherit; }
+  .receipt-print-target .receipt-lines > .receipt-line { align-items: baseline; }
+}

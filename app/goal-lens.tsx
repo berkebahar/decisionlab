@@ -186,7 +186,7 @@ export default function GoalLens({ initialGoal, initialMode = "purchase" }: { in
         <p className={styles.inputNote}><Icon name="info" size={16} /> Start with the example, or make it your own.</p>
       </form>
 
-      <div className={`calculator-output-panel ${styles.results}`} aria-live="polite" aria-atomic="true">
+      <div className={`calculator-output-panel ${styles.results}`} data-pointer-light aria-live="polite" aria-atomic="true">
         {!valid && <div className={styles.validation}><Icon name="target" size={38} /><h3>Your next insight starts here.</h3><p>{hasErrors ? "Check the highlighted fields to calculate and save your comparison." : calculationError}</p></div>}
         {valid && !("error" in first) && (
           <>

@@ -1,0 +1,7 @@
+.pointer-light {
+  position: fixed; z-index: 15; pointer-events: none; overflow: hidden;
+  opacity: 0; background: radial-gradient(circle 210px at var(--light-x) var(--light-y), rgb(233 223 185 / .11), rgb(198 222 182 / .035) 48%, transparent 72%);
+  transition: opacity 180ms ease; contain: strict;
+}
+.pointer-light[data-visible="true"] { opacity: 1; }
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse), (forced-colors: active), print { .pointer-light { display: none; } }
