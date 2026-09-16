@@ -1,0 +1,113 @@
+/* A photographic opening, scoped to Home. Tools keep their opaque theme surfaces. */
+.botanical-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: #101f18;
+  color: #f7f4ed;
+  border-bottom: 1px solid #8f805a;
+}
+.botanical-backdrop { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.botanical-backdrop img { object-fit: cover; object-position: center; }
+.botanical-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(8 24 17 / .82), rgb(8 24 17 / .5) 44%, rgb(8 24 17 / .12)), linear-gradient(0deg, rgb(8 24 17 / .75), transparent 28%);
+}
+.botanical-hero .product-hero { padding-block: 64px 72px; align-items: center; gap: clamp(32px, 6vw, 88px); }
+.botanical-hero .hero-copy { padding-top: 0; min-width: 0; }
+.botanical-hero h1 { color: #f7f4ed; max-width: 13ch; text-wrap: balance; }
+.botanical-hero .hero-copy .eyebrow { color: #dccb9f; padding-left: 36px; position: relative; margin-bottom: 24px; }
+.botanical-hero .hero-copy .eyebrow::before { content: ""; position: absolute; left: 0; top: .7em; width: 23px; height: 1px; background: #b59a64; }
+.botanical-hero .hero-description { color: #e5e9df; font-size: 17px; max-width: 42ch; }
+.botanical-hero .hero-trust, .botanical-hero .hero-assurance { color: #c9d5cb; }
+.botanical-hero .hero-trust .icon { color: #dccb9f; }
+.botanical-hero .hero-assurance { border-color: #6a7a66; font-size: 13px; max-width: 46ch; }
+.botanical-hero .hero-actions .button-primary { background: #f7f4ed; color: #123c32; border-color: #f7f4ed; box-shadow: 0 4px 16px rgb(0 0 0 / .12); }
+.botanical-hero .hero-actions .button-primary:hover { background: #e5dbc3; border-color: #e5dbc3; }
+.botanical-hero .hero-actions .button-outline { background: #142e22; color: #f7f4ed; border-color: #83947f; }
+.botanical-hero .hero-actions .button-outline:hover { background: #254434; border-color: #d6c397; }
+.botanical-hero .hero-copy :focus-visible { outline: 3px solid #ead7a9; outline-offset: 5px; }
+.botanical-hero .hero-atmosphere { opacity: .35; }
+.botanical-hero .atmosphere-grid { stroke: #becbb6; opacity: .1; }
+.botanical-hero .atmosphere-path { stroke: #d6c397; opacity: .22; }
+.botanical-preview-caption { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 14px; color: #eee8d7; font-size: 12px; }
+.botanical-preview-caption > :last-child { display: inline-flex; align-items: center; gap: 8px; }
+.botanical-preview-caption > :last-child::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #d6c397; }
+/* An ivory paper instrument remains readable in both surrounding themes. */
+.botanical-hero .hero-receipt-preview {
+  color-scheme: light;
+  --foreground: #17221e;
+  --muted: #536057;
+  --surface: #f7f4ed;
+  --surface-soft: #ecece1;
+  --border: #cdd0c0;
+  --blue: #123c32;
+  --focus: #33725e;
+  --warm: #735a2f;
+  --warm-soft: #f0e9db;
+}
+.botanical-hero .preview-control { border-radius: 10px 10px 0 0; margin: 0; border-bottom: 0; padding: 18px 24px; color: #17221e; }
+.botanical-hero .preview-control label { align-items: center; }
+.botanical-hero .preview-control output { font-size: 20px; }
+.botanical-hero .preview-control input { display: block; min-height: 32px; margin-block: 6px; }
+.botanical-hero .true-receipt { border-radius: 0 0 5px 5px; box-shadow: 0 28px 64px -20px rgb(0 0 0 / .55); }
+.botanical-hero .receipt-results { border-color: #bcc5b4; }
+.botanical-hero .true-receipt > .product-notice { border-left-color: #9b8050; }
+@media (min-width: 1001px) { .botanical-hero .hero-lab { max-width: 470px; width: 100%; justify-self: end; } }
+@media (max-width: 1000px) {
+  .botanical-hero .product-hero { padding-block: 46px 54px; gap: 36px; }
+  .botanical-backdrop img { object-position: 65% top; }
+  .botanical-backdrop::after { background: linear-gradient(90deg, rgb(8 24 17 / .86), rgb(8 24 17 / .4)), linear-gradient(0deg, #101f18, transparent 55%); }
+  .botanical-hero .hero-copy { max-width: 580px; width: 100%; justify-self: center; }
+  .botanical-hero h1 { max-width: 16ch; }
+}
+@media (max-width: 440px) {
+  .botanical-hero .product-hero { padding-block: 36px 40px; gap: 28px; }
+  .botanical-hero h1 { font-size: 40px; }
+  .botanical-hero .hero-description { font-size: 16px; }
+  .botanical-hero .hero-actions > a { width: 100%; min-height: 48px; justify-content: center; }
+  .botanical-hero .preview-control { padding-inline: 20px; }
+  .botanical-hero .hero-copy .eyebrow { padding-left: 0; margin-bottom: 20px; }
+  .botanical-hero .hero-copy .eyebrow::before { display: none; }
+}
+@media print { .botanical-backdrop { display: none; } }
+
+/* Forest glass for the live control; the receipt below remains solid paper. */
+.botanical-hero .hero-receipt-preview .preview-control {
+  --focus: #ead7a9;
+  background: #183a2e;
+  color: #f7f4ed;
+  border: 1px solid #6d8974;
+  border-radius: 18px;
+  margin-bottom: 16px;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .25), inset 1px 0 0 rgb(255 255 255 / .08), 0 12px 32px -18px rgb(0 0 0 / .45);
+  transition: border-color 200ms, box-shadow 200ms;
+}
+.botanical-hero .hero-receipt-preview .preview-control p { color: #dae4d7; }
+.botanical-hero .hero-receipt-preview .preview-control input { accent-color: #decba0; min-height: 44px; }
+.botanical-hero .hero-receipt-preview .preview-control output {
+  padding: 2px 12px; min-width: 44px; text-align: center;
+  border-radius: 999px; background: #304e3f; color: #fff8e8;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .18);
+}
+.botanical-hero .hero-receipt-preview .preview-control:focus-within { border-color: #ead7a9; }
+.botanical-hero .hero-receipt-preview .true-receipt { border-radius: 10px 10px 5px 5px; }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .botanical-hero .hero-receipt-preview .preview-control {
+    background: linear-gradient(125deg, rgb(234 247 225 / .1), transparent 65%), rgb(18 49 35 / .8);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    backdrop-filter: blur(16px) saturate(120%);
+    border-color: rgb(216 235 204 / .4);
+  }
+  .botanical-hero .hero-receipt-preview .preview-control:focus-within { border-color: #ead7a9; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .botanical-hero .hero-receipt-preview .preview-control { background: #183a2e; -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (forced-colors: active) {
+  .botanical-hero .hero-receipt-preview .preview-control { background: Canvas; color: CanvasText; border-color: CanvasText; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .botanical-hero .hero-receipt-preview .preview-control p,
+  .botanical-hero .hero-receipt-preview .preview-control output { color: CanvasText; }
+}

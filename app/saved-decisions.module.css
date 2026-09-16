@@ -1,0 +1,32 @@
+.sectionHeader { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+.newDecision { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; color: var(--blue); font-size: 13px; font-weight: 550; }
+.newDecision:hover { text-decoration: underline; text-underline-offset: 4px; }
+.count { display: inline-grid; place-items: center; width: 30px; height: 30px; vertical-align: middle; margin-left: 6px; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); background: var(--surface-soft); font-family: var(--font-geist-mono), monospace; font-size: 12px; letter-spacing: 0; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 28px; }
+.grid:empty { display: none; }
+.card[class] { min-width: 0; padding: 24px; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); box-shadow: var(--shadow-sm); overflow-wrap: anywhere; transition: border-color 180ms, transform 180ms; }
+.card:hover { border-color: color-mix(in srgb, var(--blue) 45%, var(--border)); transform: translateY(-2px); }
+.cardHeader { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); }
+.mode { display: flex; align-items: center; gap: 7px; color: var(--blue); font-size: 12px; font-weight: 550; }
+.card h3 { display: flex; align-items: center; gap: 8px; margin: 22px 0 0; font-size: 19px; font-weight: 650; letter-spacing: -.5px; }
+.card h3 svg { flex-shrink: 0; color: var(--muted); }
+.assumptions { margin: 9px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
+.card ul { margin: 19px 0 0; padding: 0; list-style: none; }
+.card .purchase { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-block: 17px; border-top: 1px solid var(--border); }
+.purchase > div:first-child { min-width: 0; }
+.purchase > div:first-child strong { display: block; font-size: 14px; font-weight: 550; }
+.purchase > div:first-child span { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+.delay { min-width: 0; max-width: 55%; flex-shrink: 0; text-align: right; color: var(--warning); overflow-wrap: anywhere; }
+.delay[data-impact="low"] { color: var(--success); }
+.delay[data-impact="high"] { color: var(--danger); }
+.delay strong { display: block; font-size: 26px; letter-spacing: -.9px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.delay span { display: block; font-size: 12px; color: var(--muted); }
+.cardFooter { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--border); }
+.cardFooter > span { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12px; }
+.cardFooter button { margin: 0; }
+.empty { display: flex; flex-direction: column; align-items: center; background-image: radial-gradient(var(--border) .8px, transparent .8px); background-size: 18px 18px; }
+.emptyBrand { width: 48px; height: 48px; margin-bottom: 18px; }
+.emptyEyebrow { margin-bottom: 12px; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: .5px; }
+@media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 440px) { .card[class] { padding: 20px; } }
+@media (prefers-reduced-motion: reduce) { .card[class] { transition: none; } .card:hover { transform: none; } }
