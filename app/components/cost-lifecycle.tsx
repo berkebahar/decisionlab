@@ -163,9 +163,9 @@ export default function CostLifecycle() {
     setAnnouncement(`${index + 1} of ${lifecycleStages.length}: ${lifecycleStages[index].label}, ${lifecycleStages[index].value}. ${lifecycleStages[index].detail}`);
   }
   return <section className="cost-lifecycle" id="cost-explorer" aria-labelledby="cost-explorer-heading">
-    <div className="lifecycle-ambient-type" data-atmosphere-reveal="typography" aria-hidden="true">
+    <div className="lifecycle-ambient-type" aria-hidden="true">
       <div className="lifecycle-type-track">
-        {[0, 1].map(copy => <span key={copy}>Buy · Own · Use · Maintain · Resell ·&nbsp;</span>)}
+        <span>Buy · Own · Use · Maintain · Resell</span>
       </div>
     </div>
     <header className="container lifecycle-heading"><div><p className="eyebrow">02 / Explore the cost</p><h2 id="cost-explorer-heading">Every purchase has<br />more than one price.</h2></div><p id="lifecycle-help">Swipe, drag, or use the arrows to explore.<br />One purchase. Five perspectives.</p></header>

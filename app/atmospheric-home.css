@@ -59,8 +59,7 @@
   .editorial-home .hidden-cost-breakdown { box-shadow: none; animation: none; }
 }
 
-/* A decorative type ribbon sits behind the explorer; real figures stay still.
-   Observe the clipped wrapper, never the moving track, to avoid visibility churn. */
+/* A still editorial backdrop leaves movement to the cost sequence. */
 .editorial-home .lifecycle-ambient-type {
   position: absolute; z-index: -1; inset: 8px 0 auto; overflow: clip;
   pointer-events: none; user-select: none; opacity: .08; color: #dccb9f;
@@ -72,14 +71,6 @@
 
 /* Slow ambient layers share the existing atmosphere pause control. */
 @media screen and (prefers-reduced-motion: no-preference) {
-  .editorial-home .lifecycle-ambient-type[data-ambient="true"] .lifecycle-type-track {
-    animation: lifecycle-type-drift 90s linear infinite;
-    animation-play-state: paused;
-  }
-  .editorial-home .lifecycle-ambient-type[data-ambient-active="true"] .lifecycle-type-track { animation-play-state: running; }
-  .editorial-home[data-atmosphere-paused="true"] .lifecycle-ambient-type .lifecycle-type-track,
-  .editorial-home[data-atmosphere-hidden="true"] .lifecycle-ambient-type .lifecycle-type-track { animation-play-state: paused; }
-  @keyframes lifecycle-type-drift { to { transform: translate3d(-50%, 0, 0); } }
   .editorial-home .botanical-shade svg[data-ambient="true"] {
     --sway-x: 14px; --sway-y: 7px;
     animation: botanical-ambient-sway 24s ease-in-out infinite alternate;

@@ -14,14 +14,7 @@ export default function TrueCostReceipt({ analysis: a, demo = false, compact = f
   useEffect(() => () => { printCleanup.current?.(); }, []);
   const money = (n: number) => formatMoney(n, a.currency);
   const optional = (n: number | null, calculated = n) => n === null ? "Unknown · excluded" : money(calculated ?? 0);
-  function print() {
-    const element = receipt.current; if (!element) return;
-    printCleanup.current?.();
-    printCleanup.current = printReceipt(element);
-  }
-  return <article ref={receipt} className={`true-receipt ${compact ? "receipt-compact" : ""}`} aria-labelledby={heading}>
-    <header className="receipt-heading"><p className="eyebrow">DecisionLab / {demo ? "Fictional demonstration" : "Your estimates"}</p><h2 id={heading}>True Cost Receipt</h2><p>{a.name}{a.model ? ` · ${a.model}` : ""}</p><span>{a.condition} · {a.currency} · {r.months} months planned ownership</span></header>
-    {demo && <p className="product-notice">Fictional example, not current market prices or product specifications. Nothing here is saved.</p>}
+  const breakdown = <>
     <dl className="receipt-lines">
       <ReceiptLine label="Sticker price" help={compact ? undefined : "The purchase price you entered, before tax, shipping, or future expenses."}>{money(a.price)}</ReceiptLine>
       <ReceiptLine label="+ Tax" help={compact ? undefined : "The tax amount you entered, not a percentage. Unknown tax is excluded from the estimate."}>{optional(a.tax)}</ReceiptLine>
@@ -36,14 +29,35 @@ export default function TrueCostReceipt({ analysis: a, demo = false, compact = f
       <ReceiptLine label="Ownership expenses" subtotal>{money(r.ownership)}</ReceiptLine>
       <ReceiptLine label="− Expected resale deduction" offset help={compact ? undefined : "Your estimated resale reduces ownership cost. The deduction cannot exceed modeled costs; resale is not guaranteed."}>{optional(a.resale, r.resaleDeduction)}</ReceiptLine>
     </dl>
+  </>;
+  function print() {
+    const element = receipt.current; if (!element) return;
+    printCleanup.current?.();
+    printCleanup.current = printReceipt(element);
+  }
+  return <article ref={receipt} className={`true-receipt ${compact ? "receipt-compact" : ""}`} aria-labelledby={heading}>
+    <header className="receipt-heading"><p className="eyebrow">DecisionLab / {demo ? "Fictional demonstration" : "Your estimates"}</p><h2 id={heading} tabIndex={-1}>True Cost Receipt</h2><p>{a.name}{a.model ? ` · ${a.model}` : ""}</p><span>{a.condition} · {a.currency} · {r.months} months planned ownership</span></header>
+    {demo && <p className="product-notice">Fictional example · not market prices. Nothing is saved.</p>}
+    {compact ? <dl className="receipt-lines receipt-overview">
+      <ReceiptLine label="Sticker price">{money(a.price)}</ReceiptLine>
+      {a.tax !== 0 && <ReceiptLine label="+ Tax">{optional(a.tax)}</ReceiptLine>}
+      {a.shipping !== 0 && <ReceiptLine label="+ Shipping">{optional(a.shipping)}</ReceiptLine>}
+      <ReceiptLine label="+ Ownership expenses">{money(r.ownership)}</ReceiptLine>
+      <ReceiptLine label="− Expected resale deduction" offset>{optional(a.resale, r.resaleDeduction)}</ReceiptLine>
+    </dl> : <>
+      {breakdown}
+    </>}
     <div className="receipt-results" aria-live={compact ? "polite" : undefined}>
-      <div><span>Estimated true cost · net ownership</span><strong><span className="receipt-amount" key={money(r.net)}>{money(r.net)}</span></strong></div>
+      <div className="receipt-total"><span>Estimated true cost · net ownership</span><strong><span className="receipt-amount" key={money(r.net)}>{money(r.net)}</span></strong></div>
       <div className="receipt-per-use"><span>Estimated cost per use</span><strong><span className="receipt-amount" key={r.costPerUse === null ? "none" : formatUnitCost(r.costPerUse, a.currency)}>{r.costPerUse === null ? "Not available" : formatUnitCost(r.costPerUse, a.currency)}</span></strong><span>{r.costPerUse === null ? "Enter more than zero expected uses to calculate." : `Across approximately ${formatQuantity(r.totalUses)} uses`}</span></div>
     </div>
-    {!compact && <dl className="receipt-lines"><div><dt>Purchase-price difference from alternative</dt><dd>{r.alternativeDifference === null ? "No alternative entered" : `${r.alternativeDifference >= 0 ? "+" : "−"}${money(Math.abs(r.alternativeDifference))}`}</dd></div>{a.alternative && <div><dt>Alternative</dt><dd>{a.alternative.name} · {money(a.alternative.price)}</dd></div>}<div><dt>Selected goal / upfront impact</dt><dd>{!r.goal ? "Not included" : r.goal.delay === null ? "Goal cannot be reached under these assumptions" : `+${formatQuantity(r.goal.delay)} ${r.goal.unit}s`}</dd></div></dl>}
+    {!compact && (a.alternative || a.goal) && <dl className="receipt-lines"><div><dt>Purchase-price difference from alternative</dt><dd>{r.alternativeDifference === null ? "No alternative entered" : `${r.alternativeDifference >= 0 ? "+" : "−"}${money(Math.abs(r.alternativeDifference))}`}</dd></div>{a.alternative && <div><dt>Alternative</dt><dd>{a.alternative.name} · {money(a.alternative.price)}</dd></div>}<div><dt>Selected goal / upfront impact</dt><dd>{!r.goal ? "Not included" : r.goal.delay === null ? "Goal cannot be reached under these assumptions" : `+${formatQuantity(r.goal.delay)} ${r.goal.unit}s`}</dd></div></dl>}
     {!compact && <ProductScore analysis={a} />}
-    <p className="receipt-note">{r.missing.length ? "More information is needed for a reliable comparison. Unknown values are excluded, not assumed to be zero." : "All cost fields are filled; they remain user-entered estimates, not verified prices."} {r.ongoingShare >= .25 && "Ongoing costs are at least 25% of modeled gross cost."} The result depends on expected usage; halve the uses and cost per use doubles.</p>
+    <p className="receipt-note">{r.missing.length ? "Incomplete estimate: unknown costs are excluded, not treated as zero." : "Based on your estimates, not verified prices."} {!compact && r.ongoingShare >= .25 && "Ongoing costs are at least 25% of modeled gross cost."}{!compact && " Cost per use depends on expected usage."}</p>
     {r.resaleCapped && <p className="product-notice">Entered resale exceeds modeled costs. The deduction is capped at those costs; net cost is floored at zero, not treated as profit.</p>}
+    {compact && <details className="receipt-breakdown"><summary>Full cost breakdown</summary>
+      {breakdown}
+    </details>}
     <details className="receipt-assumptions"><summary>Assumptions, missing inputs & formulas</summary>
       <p>Inputs are your estimates. Totals and cost per use are DecisionLab calculations. {r.missing.length ? `Unknown or excluded: ${r.missing.join(", ")}.` : "No cost inputs are missing."}</p>
       <p>Ownership: {a.duration} {a.durationUnit}; usage: {a.uses} per {a.useFrequency}. Years use 12 months and 52 weeks. Weekly usage is spread evenly across months. These are expectations, not durability guarantees.</p>

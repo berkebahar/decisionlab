@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default function InsightsPage() {
-  return <div className="container">
-    <PageHeading page="Insights" eyebrow="FIND THE SIGNAL IN YOUR CHOICES" title="What your choices can tell you.">Keep possibilities separate from experience. No invented trends, automatic savings claims, or universal scores.</PageHeading>
+  return <div className="container product-page">
+    <PageHeading page="Insights" eyebrow="Learn from experience" title="What your choices can tell you.">A few useful observations from your own decisions and purchase reviews.</PageHeading>
     <ProductInsights />
     <details className="legacy-insights"><summary>Supporting insights: goals, GoalLens decisions & scenarios</summary><InsightsWorkspace /></details>
   </div>;

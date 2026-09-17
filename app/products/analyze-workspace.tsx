@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import ProductForm from "./product-form";
@@ -17,6 +17,12 @@ function AnalysisEditor({ record, duplicate = false, demo }: { record?: ProductR
   const [saved, setSaved] = useState<ProductRecord | null>(duplicate ? null : record ?? null);
   const [message, setMessage] = useState("");
   const [demoActive, setDemoActive] = useState(!!demo);
+  const result = useRef<HTMLDivElement>(null);
+  const wasEditing = useRef(editing);
+  useEffect(() => {
+    if (wasEditing.current && !editing) result.current?.querySelector<HTMLElement>(".receipt-heading h2")?.focus();
+    wasEditing.current = editing;
+  }, [editing]);
   function save() {
     if (!analysis || demoActive) return;
     try {
@@ -26,8 +32,8 @@ function AnalysisEditor({ record, duplicate = false, demo }: { record?: ProductR
       setSaved(result); notifyStorageChange(); setMessage("Receipt saved to your decision queue.");
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not save. Existing records are unchanged."); }
   }
-  if (editing) return <><p className="product-notice">{demoActive ? "Fictional demonstration. Nothing is stored unless you explicitly use these assumptions and save." : duplicate ? "Independent copy: change assumptions without altering the original." : "Nothing is saved until you choose Save receipt."}</p><ProductForm initial={analysis ?? undefined} onComplete={a => { setAnalysis(a); setEditing(false); setMessage(""); }} onCancel={analysis ? () => setEditing(false) : undefined} /></>;
-  return analysis && <div className="analysis-result"><TrueCostReceipt analysis={analysis} demo={demoActive} /><aside className="receipt-next"><p className="eyebrow">Step 5 of 5 · Receipt</p><h2>Your next step</h2><p>A receipt makes assumptions visible. Whether the purchase is worthwhile remains your decision.</p><div className="product-actions">{demoActive ? <button type="button" className="button-outline" onClick={() => setDemoActive(false)}>Use this example as my starting point</button> : <button type="button" className="button-primary" onClick={save}>{saved ? "Save updated receipt" : "Save receipt to queue"}</button>}<button type="button" className="button-outline" onClick={() => setEditing(true)}>Edit assumptions</button></div><p role="status" className="product-status">{message}</p>{saved && <><Link className="text-link" href={`/compare?ids=${encodeURIComponent(saved.id)}`}>Compare this product →</Link><Link className="text-link" href="/queue">Open decision queue →</Link></>}<p className="product-helper">Records stay on this browser/device. Clearing browser data can erase them. Export a backup from the queue.</p>{record?.purchaseEstimate && <p className="product-helper">The original estimate captured when marked bought remains unchanged for post-purchase reviews.</p>}</aside></div>;
+  if (editing) return <>{(demoActive || duplicate) && <p className="product-local-note">{demoActive ? "Fictional demonstration. Nothing is stored unless you explicitly use these assumptions and save." : duplicate ? "Independent copy: change assumptions without altering the original." : "Nothing is saved until you choose Save receipt."}</p>}<ProductForm initial={analysis ?? undefined} onComplete={a => { setAnalysis(a); setEditing(false); setMessage(""); }} onCancel={analysis ? () => setEditing(false) : undefined} /></>;
+  return analysis && <div ref={result} className="analysis-result"><TrueCostReceipt analysis={analysis} demo={demoActive} /><aside className="receipt-next"><p className="eyebrow">Step 5 of 5 · Receipt</p><h2>Your next step</h2><p>Save this receipt to reconsider later, or refine your assumptions.</p><div className="product-actions">{demoActive ? <button type="button" className="button-outline" onClick={() => setDemoActive(false)}>Use this example as my starting point</button> : <button type="button" className="button-primary" onClick={save}>{saved ? "Save updated receipt" : "Save receipt to queue"}</button>}<button type="button" className="button-outline" onClick={() => setEditing(true)}>Edit assumptions</button></div><p role="status" className="product-status">{message}</p>{saved && <><Link className="text-link" href={`/compare?ids=${encodeURIComponent(saved.id)}`}>Compare this product →</Link><Link className="text-link" href="/queue">Open decision queue →</Link></>}<p className="product-helper">Records stay on this browser/device. Clearing browser data can erase them. Export a backup from the queue.</p>{record?.purchaseEstimate && <p className="product-helper">The original estimate captured when marked bought remains unchanged for post-purchase reviews.</p>}</aside></div>;
 }
 export default function AnalyzeWorkspace() {
   const params = useSearchParams(), { records, loading, error } = useProducts();

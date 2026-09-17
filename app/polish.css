@@ -108,7 +108,7 @@ input[type="range"] { min-height: 44px; cursor: pointer; }
 .experiment-copy > p:not(.eyebrow), .about-grid .content-panel > p:not(.eyebrow), .creator-copy > p:not(.eyebrow) { font-size: 16px; line-height: 1.8; }
 .footer-bottom { gap: 16px; }
 .creator-credit { font-size: 14px; color: var(--foreground); }
-.term-trigger { min-height: 32px; text-underline-offset: 4px; }
+.term-trigger { min-height: 44px; text-underline-offset: 4px; }
 .term-tip .term-content { position: fixed; inset: auto; bottom: auto; z-index: 100; max-width: calc(100vw - 32px); font-size: 14px; line-height: 1.65; }
 /* Native details stay usable even when this animation API is unavailable. */
 @media (prefers-reduced-motion: no-preference) {

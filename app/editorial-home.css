@@ -1,6 +1,6 @@
 /* An editorial rhythm around the existing tools. All rules are scoped to Home. */
 .editorial-home { overflow-wrap: break-word; }
-.editorial-home .editorial-section { padding-block: clamp(64px, 7.5vw, 112px); }
+.editorial-home .editorial-section { padding-block: clamp(60px, 6.5vw, 96px); }
 .editorial-home .editorial-section h2 { margin-block: 14px 24px; font-size: clamp(34px, 4.2vw, 58px); font-weight: 400; line-height: 1.12; letter-spacing: -.035em; }
 .editorial-home .editorial-section-copy > p:not(.eyebrow),
 .editorial-home .editorial-section-heading > p:not(.eyebrow) { max-width: 46ch; color: var(--muted); font-size: 16px; line-height: 1.8; }
@@ -27,11 +27,7 @@
 .editorial-home .editorial-hero .rain-toggle { bottom: 24px; }
 
 .editorial-home .editorial-receipt-section { scroll-margin-top: 100px; background: var(--surface-soft); }
-.editorial-home .editorial-receipt-layout { display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: clamp(40px, 7vw, 108px); }
-.editorial-home .editorial-receipt-guide { display: grid; gap: 22px; margin-block: 34px 24px; }
-.editorial-home .editorial-receipt-guide > div { padding-left: 18px; border-left: 1px solid var(--champagne); }
-.editorial-home .editorial-receipt-guide dt { font-size: 16px; font-weight: 550; }
-.editorial-home .editorial-receipt-guide dd { margin: 5px 0 0; color: var(--muted); font-size: 14px; }
+.editorial-home .editorial-receipt-layout { display: grid; grid-template-columns: .85fr 1.15fr; align-items: center; gap: clamp(40px, 7vw, 108px); }
 .editorial-home .editorial-live-receipt { min-width: 0; width: 100%; max-width: 600px; justify-self: end; }
 .editorial-home .hero-receipt-preview {
   color-scheme: light;
@@ -97,10 +93,6 @@
 .editorial-home .editorial-closing { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 32px; padding-block: 60px 48px; margin-top: 40px; border-top: 1px solid var(--border); }
 .editorial-home .editorial-closing h2 { margin: 0; }
 .editorial-home .editorial-closing > div > p { color: var(--muted); font-size: 12px; margin-top: 20px; }
-.editorial-home .editorial-small-choices .small-choices { width: 100%; margin-top: 20px; }
-.editorial-home .editorial-small-choices .small-choices h2 { font-size: clamp(30px, 3vw, 40px); }
-.editorial-home .editorial-creator .creator-section { border-top: 0; padding-block: 28px; }
-.editorial-home .editorial-creator .creator-copy h2 { font-size: clamp(30px, 3vw, 40px); }
 
 @media (max-width: 1000px) {
   .editorial-home .editorial-receipt-layout { gap: 36px; grid-template-columns: .9fr 1.1fr; }
@@ -118,10 +110,6 @@
   .editorial-home .editorial-hero .hero-actions .button-primary { gap: 20px; }
   .editorial-home .editorial-hero .botanical-backdrop img { object-position: 64% center; }
   .editorial-home .editorial-receipt-layout, .editorial-home .editorial-queue-layout { grid-template-columns: minmax(0, 1fr); gap: 36px; }
-  .editorial-home .editorial-receipt-guide { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }
-  .editorial-home .editorial-receipt-guide > div { padding-left: 12px; }
-  .editorial-home .editorial-receipt-guide dt { font-size: 14px; }
-  .editorial-home .editorial-receipt-guide dd { font-size: 12px; }
   .editorial-home .editorial-section-heading { margin-bottom: 32px; }
   .editorial-home .editorial-comparison-columns { gap: 36px; }
   .editorial-home .editorial-product-column h3 { font-size: 27px; }
@@ -226,4 +214,28 @@
   .hidden-cost-reveal[open] .hidden-cost-lines > div:nth-child(4) { animation-delay: 105ms; }
   .hidden-cost-reveal[open] .hidden-cost-total { animation: hidden-cost-line-settle 280ms 140ms ease-out; }
   @keyframes hidden-cost-line-settle { from { transform: translateY(4px); opacity: .86; } to { transform: translateY(0); opacity: 1; } }
+}
+
+/* Let the receipt carry the explanation; supporting sections stay quieter. */
+.editorial-home .hero-receipt-preview .receipt-total strong { font-size: clamp(34px, 10cqw, 52px); }
+.editorial-home .hero-receipt-preview .receipt-per-use strong { font-size: clamp(28px, 8cqw, 38px); }
+.editorial-home .hero-receipt-preview .receipt-per-use { padding-left: 0; }
+.editorial-home .editorial-reflection { padding-bottom: 24px; }
+@media (max-width: 440px) {
+  .editorial-home .editorial-section h2 { font-size: clamp(30px, 8.8vw, 38px); }
+  .editorial-home .hero-receipt-preview .receipt-total strong { font-size: clamp(30px, 10cqw, 40px); }
+}
+
+@media screen {
+  .editorial-home .editorial-receipt-layout { align-items: start; }
+  .editorial-home .editorial-receipt-layout > .editorial-section-copy { padding-top: 134px; }
+  .editorial-home .editorial-receipt-layout .text-link { margin-top: 24px; }
+  .editorial-home .hero-receipt-preview .true-receipt { padding: clamp(24px, 2.6vw, 32px); }
+  .editorial-home .hero-receipt-preview .receipt-heading { padding-bottom: 18px; }
+  .editorial-home .hero-receipt-preview .product-notice { margin-block: 12px 0; padding-block: 8px; }
+  .editorial-home .hero-receipt-preview .receipt-overview { padding-block: 12px; }
+  .editorial-home .hero-receipt-preview .receipt-overview > div { padding-block: 8px; }
+}
+@media screen and (max-width: 760px) {
+  .editorial-home .editorial-receipt-layout > .editorial-section-copy { padding-top: 0; }
 }
