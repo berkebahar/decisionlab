@@ -2,18 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { glide } from "./cost-motion";
 import BotanicalShade from "./botanical-shade";
 import { storyAssumptions, storyIndex, storyMoney, storyProduct, storyResult, storyStages, storyUnitCost } from "./cost-story-model";
 
 export default function CostScrollStory() {
   // A complete statement is the server/no-script/small-screen fallback.
-  const [stage, setStage] = useState(4);
+  const [selection, setSelection] = useState({ stage: 4, previous: 4 });
+  const { stage, previous } = selection;
+  const setStage = (next: number) => setSelection(value => value.stage === next ? value : { stage: next, previous: value.stage });
   const [announcement, setAnnouncement] = useState("");
   const root = useRef<HTMLElement>(null);
   const scene = useRef<HTMLDivElement>(null);
-  const outgoing = useRef<HTMLSpanElement>(null);
-  const lastValue = useRef(storyStages[4].value);
+  const number = useRef<HTMLElement>(null);
+  const lastFigure = useRef<{ x: number; y: number; fontSize: number } | null>(null);
   const enhanced = useRef(false);
   const select = useRef<(index: number) => void>(() => {});
 
@@ -21,27 +24,42 @@ export default function CostScrollStory() {
     const element = root.current, composition = scene.current;
     if (!element || !composition) return;
     const eligible = window.matchMedia("(min-width: 1000px) and (min-height: 740px) and (prefers-reduced-motion: no-preference)");
-    let frame = 0, visible = true, top = 88, span = 1;
+    let frame = 0, visible = true, top = 88, span = 1, start = 0;
+    let position = 0, target = 0, velocity = 0, lastTime = 0, initialized = false;
     const size = () => {
       top = parseFloat(getComputedStyle(composition).top) || 0;
       span = Math.max(1, element.offsetHeight - composition.offsetHeight);
+      start = window.scrollY + element.getBoundingClientRect().top - top;
     };
-    const measure = () => {
+    const paint = () => {
+      composition.style.setProperty("--story-progress", position.toFixed(5));
+      setStage(storyIndex(position));
+    };
+    const animate = (time: number) => {
       frame = 0;
       if (!enhanced.current || !visible || document.hidden) return;
-      const progress = Math.max(0, Math.min(1, (top - element.getBoundingClientRect().top) / span));
-      // One positional read per scroll frame; size/style reads happen on resize.
-      composition.style.setProperty("--story-progress", progress.toFixed(4));
-      composition.style.setProperty("--stage-progress", Math.min(1, progress * 5 - storyIndex(progress)).toFixed(4));
-      setStage(storyIndex(progress));
+      const seconds = Math.min((time - (lastTime || time - 16.67)) / 1000, .05);
+      lastTime = time;
+      const next = glide(position, velocity, target, seconds, target >= .8 ? 7 : 9);
+      position = next.position; velocity = next.velocity;
+      const settled = Math.abs(target - position) < .0001 && Math.abs(velocity) < .001;
+      if (settled) { position = target; velocity = 0; lastTime = 0; }
+      paint();
+      if (!settled) frame = requestAnimationFrame(animate);
     };
-    const schedule = () => { if (!frame && enhanced.current && visible && !document.hidden) frame = requestAnimationFrame(measure); };
+    const schedule = () => {
+      if (!enhanced.current || !visible || document.hidden) return;
+      // Geometry is cached on resize; scrolling only updates the desired progress.
+      target = Math.max(0, Math.min(1, (window.scrollY - start) / span));
+      if (!initialized) { position = target; initialized = true; paint(); }
+      if (!frame) frame = requestAnimationFrame(animate);
+    };
     const configure = () => {
       enhanced.current = eligible.matches;
       element.dataset.scroll = String(eligible.matches);
       size();
       if (eligible.matches) schedule();
-      else { cancelAnimationFrame(frame); frame = 0; composition.style.removeProperty("--story-progress"); composition.style.removeProperty("--stage-progress"); setStage(4); }
+      else { cancelAnimationFrame(frame); frame = 0; composition.style.removeProperty("--story-progress"); lastTime = 0; velocity = 0; initialized = false; setStage(4); }
     };
     select.current = index => {
       if (!enhanced.current) { setStage(index); return; }
@@ -49,9 +67,9 @@ export default function CostScrollStory() {
       const destination = window.scrollY + element.getBoundingClientRect().top - top + (index + .15) / storyStages.length * span;
       // Native page scrolling, no wheel/touch interception or forced smooth tour.
       window.scrollTo({ top: destination, behavior: "instant" });
-      setStage(index);
+      schedule();
     };
-    const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; if (visible) schedule(); else { cancelAnimationFrame(frame); frame = 0; } });
+    const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; if (visible) schedule(); else { cancelAnimationFrame(frame); frame = 0; lastTime = 0; } });
     observer?.observe(element);
     const resized = () => { size(); schedule(); };
     const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(resized);
@@ -59,32 +77,41 @@ export default function CostScrollStory() {
     configure();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", resized, { passive: true });
-    document.addEventListener("visibilitychange", schedule);
+    const visibility = () => {
+      if (document.hidden) { cancelAnimationFrame(frame); frame = 0; lastTime = 0; }
+      else schedule();
+    };
+    document.addEventListener("visibilitychange", visibility);
     eligible.addEventListener("change", configure);
     return () => {
       cancelAnimationFrame(frame); observer?.disconnect(); resizeObserver?.disconnect();
       window.removeEventListener("scroll", schedule); window.removeEventListener("resize", resized);
-      document.removeEventListener("visibilitychange", schedule); eligible.removeEventListener("change", configure);
+      document.removeEventListener("visibilitychange", visibility); eligible.removeEventListener("change", configure);
       enhanced.current = false;
     };
   }, []);
 
   const current = storyStages[stage];
-  useEffect(() => {
-    const ghost = outgoing.current;
-    const previous = lastValue.current;
-    lastValue.current = current.value;
-    const motion = window.matchMedia("(prefers-reduced-motion: no-preference)");
-    if (!ghost || previous === current.value || !enhanced.current || !motion.matches || typeof ghost.animate !== "function") return;
-    ghost.textContent = previous;
-    const animation = ghost.animate([
-      { opacity: .28, transform: "translate(0, 0) scale(1)", filter: "blur(0px)" },
-      { opacity: 0, transform: "translate(-8px, -22px) scale(.95)", filter: "blur(2px)" },
-    ], { duration: 260, easing: "ease-out" });
+  const prior = storyStages[previous];
+  useLayoutEffect(() => {
+    const figure = number.current;
+    const instrument = figure?.closest(".story-instrument");
+    if (!figure || !instrument || !enhanced.current) { lastFigure.current = null; return; }
+    // FLIP only measures when the composition changes, never in the animation loop.
+    const bounds = figure.getBoundingClientRect(), origin = instrument.getBoundingClientRect();
+    const next = { x: bounds.left - origin.left, y: bounds.top - origin.top, fontSize: parseFloat(getComputedStyle(figure).fontSize) };
+    const previousFigure = lastFigure.current;
+    lastFigure.current = next;
+    if (!previousFigure || typeof figure.animate !== "function") return;
+    const animation = figure.animate([
+      { transform: `translate(${previousFigure.x - next.x}px, ${previousFigure.y - next.y}px) scale(${previousFigure.fontSize / next.fontSize})` },
+      { transform: "none" },
+    ], { duration: stage === 4 ? 1250 : 950, easing: "cubic-bezier(.22, .68, .16, 1)" });
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const stop = () => animation.cancel();
     motion.addEventListener("change", stop); window.addEventListener("beforeprint", stop);
     return () => { stop(); motion.removeEventListener("change", stop); window.removeEventListener("beforeprint", stop); };
-  }, [current.value]);
+  }, [stage]);
   return <section ref={root} className="cost-scroll-story" id="cost-story" aria-labelledby="cost-story-heading" data-scroll="false">
     <div ref={scene} className="cost-story-scene" data-stage={stage}>
       <div className="story-foreground" aria-hidden="true"><BotanicalShade placement="hero" /></div>
@@ -97,7 +124,10 @@ export default function CostScrollStory() {
             {storyStages.map((item, index) => <button type="button" key={item.label} aria-pressed={stage === index} onClick={() => { select.current(index); setAnnouncement(`${item.title} ${item.caption}: ${item.value}`); }}><span aria-hidden="true">0{index + 1}</span>{item.label}</button>)}
           </div>
           <p className="story-scroll-hint">Scroll to follow the story, or choose a stage.</p>
-          <div className="story-caption"><h3>{current.title}</h3><p>{current.detail}</p></div>
+          <div className="story-caption" key={stage}>
+            <div className="story-caption-current"><h3>{current.title}</h3><p>{current.detail}</p></div>
+            <div className="story-caption-outgoing" aria-hidden="true"><h3>{prior.title}</h3><p>{prior.detail}</p></div>
+          </div>
           <div className="story-links"><Link className="text-link" href="/analyze">Analyze your own product →</Link><a href="#cost-explorer" className="text-link">Skip to the cost explorer ↓</a></div>
           <p className="sr-only" role="status">{announcement}</p>
         </div>
@@ -108,7 +138,7 @@ export default function CostScrollStory() {
             <p className="eyebrow">DecisionLab / Fictional camera</p><h3>True Cost Receipt</h3>
             <dl><div><dt>Sticker price</dt><dd>{storyMoney(storyProduct.price)}</dd></div><div><dt>Accessories</dt><dd>+{storyMoney(storyProduct.accessories!)}</dd></div><div><dt>Maintenance · 24 months</dt><dd>+{storyMoney(storyResult.maintenance)}</dd></div><div><dt>Subscriptions · 24 months</dt><dd>+{storyMoney(storyResult.subscriptions)}</dd></div><div><dt>Expected resale</dt><dd>−{storyMoney(storyResult.resaleDeduction)}</dd></div></dl>
           </div>
-          <div className="story-figure"><span className="story-figure-label">{current.caption}</span><strong><span key={current.value} className="story-current-value">{current.value}</span><span ref={outgoing} className="story-outgoing-value" aria-hidden="true" /></strong></div>
+          <div className="story-figure"><span key={stage} className="story-figure-label">{current.caption}</span><strong ref={number}><span key={current.value} className="story-current-value">{current.value}</span><span key={`previous-${stage}`} className="story-outgoing-value" aria-hidden="true">{prior.value !== current.value ? prior.value : ""}</span></strong></div>
           <div className="story-material-caption" aria-hidden="true">
             {stage === 0 ? <span>The visible price is just the beginning.</span> : <dl className="story-cost-fragments">
               <div><dt>Accessories</dt><dd>+{storyMoney(storyProduct.accessories!)}</dd></div>
