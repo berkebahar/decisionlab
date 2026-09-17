@@ -36,7 +36,7 @@ export default function LandingAtmosphere() {
     const seen = new WeakSet<Element>();
     const cancel = (target: Element) => { animations.get(target)?.cancel(); animations.delete(target); };
     const stopAnimations = () => { animations.forEach(animation => animation.cancel()); animations.clear(); };
-    const isAmbient = (layer: Element) => layer.getAttribute("data-atmosphere-reveal") === "foliage";
+    const isAmbient = (layer: Element) => ["foliage", "typography"].includes(layer.getAttribute("data-atmosphere-reveal") ?? "");
     const observer = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(entries => {
       for (const entry of entries) {
         if (isAmbient(entry.target)) {

@@ -127,7 +127,16 @@ function send(method, params = {}, sessionId) {
       await navigate(path);
       if (name === 'home') {
         assert.equal(await evaluate(`document.querySelector('.editorial-further-reading')`), null);
-        assert.equal(await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).animationName`), 'none');
+        await evaluate(`document.querySelector('.lifecycle-heading').scrollIntoView({behavior:'instant'})`);
+        await until(`getComputedStyle(document.querySelector('.lifecycle-type-track')).animationPlayState === 'running'`);
+        assert.equal(await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).animationName`), 'lifecycle-type-drift');
+        const beforeDrift = await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).transform`);
+        await wait(150);
+        assert.notEqual(await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).transform`), beforeDrift, 'ambient words must keep moving');
+        await click('.rain-toggle');
+        assert.equal(await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).animationPlayState`), 'paused');
+        await click('.rain-toggle');
+        await evaluate(`window.scrollTo({top:0, behavior:'instant'})`);
       }
       if (name === 'compare') {
         assert.equal(await evaluate(`document.querySelector('#compare-primary-metric').value`), 'trueCost');
