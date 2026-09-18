@@ -48,7 +48,7 @@ export default function AnalyzeWorkspace() {
   const record = records.find(r => r.id === id);
   const demoIndex = params.get("demo");
   const demo = demoIndex !== null ? demoGroups[Number(demoIndex)]?.products[0] : undefined;
-  if (id && loading) return <Skeleton label="Opening your product" />;
+  if (id && loading) return <Skeleton label="Preparing your receipt" />;
   if (id && !record) return <div className="product-empty"><h2>Product unavailable</h2><p>{error || "This product is not saved in this browser, or it was deleted."}</p><Link href="/analyze" className="button-primary">Start a new analysis</Link></div>;
   return <>{error && <p className="product-error" role="status">{error}</p>}<AnalysisEditor key={id ?? demoIndex ?? "new"} record={record} duplicate={!!params.get("duplicate")} demo={demo} /></>;
 }

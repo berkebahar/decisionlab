@@ -15,7 +15,7 @@ const compile = source => ts.transpileModule(source, { compilerOptions: { module
 for (const extension of ['.ts', '.tsx']) require.extensions[extension] = (module, filename) => module._compile(compile(readFileSync(filename, 'utf8')), filename);
 const Receipt = require('../app/products/true-cost-receipt.tsx').default;
 const { demoGroups } = require('../app/products/demo-products.ts');
-const css = ['app/globals.css', 'app/polish.css', 'app/products/products.css', 'app/products/product-score.css', 'app/products/receipt-interactions.css', 'app/interaction-polish.css', 'app/editorial-workspaces.css', 'app/botanical-home.css', 'app/editorial-home.css', 'app/atmospheric-home.css', 'app/editorial-story.css', 'app/pointer-light.css'].map(path => readFileSync(resolve(path), 'utf8')).join('\n').replace('@import "tailwindcss";', '');
+const css = ['app/globals.css', 'app/polish.css', 'app/products/products.css', 'app/products/product-score.css', 'app/products/receipt-interactions.css', 'app/interaction-polish.css', 'app/decision-studio.css', 'app/editorial-workspaces.css', 'app/botanical-home.css', 'app/editorial-home.css', 'app/atmospheric-home.css', 'app/editorial-story.css', 'app/pointer-light.css'].map(path => readFileSync(resolve(path), 'utf8')).join('\n').replace('@import "tailwindcss";', '');
 const helper = compile(readFileSync('app/products/print-receipt.ts', 'utf8'));
 const artifacts = mkdtempSync(join(tmpdir(), 'decisionlab-print-review-'));
 const chrome = process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';

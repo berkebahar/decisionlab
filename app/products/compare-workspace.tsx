@@ -80,7 +80,7 @@ function Comparison({ initial, records }: { initial: Choice[]; records: ProductR
 export default function CompareWorkspace() {
   const { records, error, loading } = useProducts(), params = useSearchParams();
   const ids = (params.get("ids") ?? "").split(",").filter(Boolean).slice(0,3);
-  if (loading) return <Skeleton label="Loading product comparisons" />;
+  if (loading) return <Skeleton label="Preparing your comparison" />;
   const demo = params.get("demo") !== null ? demoGroups[Number(params.get("demo"))] : undefined;
   const initial = demo ? demo.products.map((analysis, index) => ({ key: `demo-${index}`, analysis, demo: true })) : ids.map(id => records.find(r => r.id === id)).filter((r): r is ProductRecord => !!r).map(r => ({ key:r.id, analysis:r.analysis, demo:false, sourceId:r.id }));
   return <>{error && <p role="status" className="product-error">{error}</p>}{ids.length > initial.length && <p className="product-notice">Some linked products are not available in this browser.</p>}<Comparison key={`${ids.join(",")}:${params.get("demo") ?? ""}`} initial={initial} records={records} /></>;

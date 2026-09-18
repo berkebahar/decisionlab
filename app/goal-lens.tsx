@@ -131,7 +131,7 @@ export default function GoalLens({ initialGoal, initialMode = "purchase" }: { in
         id: crypto.randomUUID(), mode, goalName: goal, ...inputs, purchases, calculationVersion: 2,
         savedAt: new Date().toISOString(),
       });
-      setMessage("Comparison saved. Find it in your dashboard’s Saved decisions.");
+      setMessage("Comparison saved. Find it in Savings Goals under Saved GoalLens comparisons.");
       setSaveCount((count) => count + 1);
     } catch {
       setMessage("We couldn’t save this comparison. Site storage may be blocked, full, or contain unreadable data. Your existing decisions have been kept.");
@@ -233,7 +233,7 @@ export default function GoalLens({ initialGoal, initialMode = "purchase" }: { in
       </div>
 
       <div className={`calculator-bottom ${styles.bottom}`}>
-      <div className={styles.actionRow}><div className={styles.actions}><button className="button-primary" type="button" disabled={!valid} onClick={save}><Icon name="plus" size={17} />Save comparison</button><button className="button-outline" type="button" onClick={reset}>Reset example</button></div><Link className={styles.savedLink} href="/dashboard#saved-decisions">View saved decisions <Icon name="arrow" size={17} /></Link></div>
+      <div className={styles.actionRow}><div className={styles.actions}><button className="button-primary" type="button" disabled={!valid} onClick={save}><Icon name="plus" size={17} />Save comparison</button><button className="button-outline" type="button" onClick={reset}>Reset example</button></div><Link className={styles.savedLink} href="/dashboard#saved-decisions">Saved GoalLens comparisons <Icon name="arrow" size={17} /></Link></div>
       <p className={`${styles.message} ${message.startsWith("Comparison saved") ? styles.success : ""}`} role="status">{message && <span key={saveCount}>{message.startsWith("Comparison saved") && <Icon name="check" size={18} />}{message}</span>}</p>
       <details className={styles.calculation}>
         <summary><span><Icon name="grid" size={17} />How the math works</span><Icon name="plus" size={17} /></summary>

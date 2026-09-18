@@ -7,7 +7,7 @@ import { ActualComparison } from "./purchase-library";
 import Skeleton from "../components/skeleton";
 export default function ProductInsights() {
   const { records, loading, error } = useProducts();
-  if (loading) return <Skeleton label="Loading product insights" />;
+  if (loading) return <Skeleton label="Preparing your insights" />;
   if (error) return <p role="status" className="product-error">{error}</p>;
   const summary = productInsights(records), reviews = records.filter(r => r.status === "bought" && r.review);
   return <section className="product-insights" aria-labelledby="product-insights-heading"><h2 id="product-insights-heading">Learn from what you actually use.</h2>{!records.length ? <div className="product-empty"><h3>Start with one purchase in mind.</h3><p>Save a True Cost Receipt first. When you buy and review a product, your experience will appear here.</p><Link className="button-primary" href="/analyze">Analyze a product</Link></div> : <>

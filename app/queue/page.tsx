@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import PageHeading from "../components/page-heading";
+import WorkspaceEntrance from "../components/workspace-entrance";
 import QueueWorkspace from "../products/queue-workspace";
 import DataBackup from "../components/data-backup";
 
-export const metadata: Metadata = { title: "Your Decision Queue", description: "Save product receipts, schedule local reconsideration dates, and record your decision." };
-export default function Page() { return <><div className="container product-page"><PageHeading page="Your Decision Queue" eyebrow="Before you buy" title="A little room before you decide.">Keep your receipts here until you’re ready to buy, postpone, or pass.</PageHeading><QueueWorkspace /></div><DataBackup /></>; }
+export const metadata: Metadata = { title: "Queue", description: "Save product receipts, schedule local reconsideration dates, and record your decision." };
+export default function Page() { return <><div className="decision-studio queue-studio"><WorkspaceEntrance page="Queue" title="Give the decision some space." words="CONSIDER · WAIT · DECIDE">Save it now. Reconsider it later.</WorkspaceEntrance><div className="container product-page studio-workspace"><QueueWorkspace /></div></div><DataBackup /></>; }

@@ -48,8 +48,8 @@ function send(method, params = {}, sessionId) {
   await cdp('Page.enable');
   await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
   await cdp('Page.navigate', { url: process.env.BASE_URL || 'http://localhost:3100' });
-  await until(`document.querySelector('.lifecycle-rail')?.dataset.motion === 'true'`);
-  await evaluate(`window.rail = document.querySelector('.lifecycle-rail'); window.scene = document.querySelector('.cost-story-scene'); window.story = document.querySelector('#cost-story'); window.errors = []; window.addEventListener('error', e => errors.push(e.message));`);
+  await until(`document.querySelector('#cost-story')?.dataset.scroll === 'true'`);
+  await evaluate(`window.scene = document.querySelector('.cost-story-scene'); window.story = document.querySelector('#cost-story'); window.errors = []; window.addEventListener('error', e => errors.push(e.message));`);
   await evaluate(`document.querySelectorAll('.story-controls button')[0].click()`);
   await until(`scene.dataset.stage === '0'`);
   await wait(1200);
@@ -69,65 +69,27 @@ function send(method, params = {}, sessionId) {
   await wait(1500);
   assert.equal(await evaluate(`document.querySelector('.story-current-value').textContent`), '$1,129.00');
   await screenshot('desktop-receipt');
-  await evaluate(`rail.scrollIntoView({block:'center', behavior:'instant'})`);
-  await wait(200);
-  await evaluate(`document.querySelector('[aria-label="Next cost perspective"]').click()`);
-  await wait(120);
-  const early = await evaluate(`rail.scrollLeft`);
-  assert.ok(early > 0 && early < 400, `gentle start: ${early}`);
-  const halfway = await evaluate(`Number(getComputedStyle(document.querySelector('.lifecycle-progress > span')).transform.split(',')[0].slice(7))`);
-  assert.ok(halfway > .2 && halfway < .4, 'progress must interpolate between stages');
-  await wait(1600);
-  assert.ok(Math.abs(await evaluate(`rail.scrollLeft`) - 800) < 1);
-  await evaluate(`rail.focus()`);
-  await cdp('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Home', code: 'Home' });
-  await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Home', code: 'Home' });
-  await wait(1800);
-  assert.ok(await evaluate(`rail.scrollLeft < 1`), 'keyboard Home should settle at first stage');
-  const rect = await evaluate(`({ y: rail.getBoundingClientRect().top + 100 })`);
-  await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: 1080, y: rect.y, button: 'left', clickCount: 1 });
-  for (let i = 1; i <= 8; i++) {
-    await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 1080 - i * 70, y: rect.y, button: 'left', buttons: 1 });
-    await wait(25);
-  }
-  const atRelease = await evaluate(`rail.scrollLeft`);
-  assert.ok(atRelease > 100 && atRelease < 560, 'drag should have weight and lag');
-  await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: 520, y: rect.y, button: 'left', clickCount: 1 });
-  await wait(150);
-  assert.ok(await evaluate(`rail.scrollLeft`) > atRelease + 20, 'release must retain momentum');
-  await wait(1800);
-  assert.ok(Math.abs(await evaluate(`rail.scrollLeft`) - 800) < 1, 'release settles at nearest projected stage');
-  await cdp('Input.dispatchMouseEvent', { type: 'mouseWheel', x: 650, y: rect.y, deltaX: 530, deltaY: 0 });
-  await wait(1800);
-  assert.ok(Math.abs(await evaluate(`rail.scrollLeft`) - 1600) < 1, 'horizontal trackpad input glides to a stage');
+  const rect = await evaluate(`({ y: scene.getBoundingClientRect().top + 100 })`);
   const scrollY = await evaluate(`window.scrollY`);
   await cdp('Input.dispatchMouseEvent', { type: 'mouseWheel', x: 650, y: rect.y, deltaX: 0, deltaY: 250 });
   await wait(250);
   assert.ok(await evaluate(`window.scrollY`) > scrollY + 50, 'vertical wheel scroll must remain native');
-  await screenshot('desktop-rail');
-  console.log('PASS desktop story inertia, final number glide, arrows, keyboard, continuous progress, mouse momentum, trackpad, vertical scroll');
+  console.log('PASS desktop story inertia, final number glide, stage controls and native vertical scroll');
 
   await cdp('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
   await cdp('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 1 });
-  await evaluate(`rail.scrollLeft = 0; rail.scrollIntoView({block:'center', behavior:'instant'})`);
+  await evaluate(`story.scrollIntoView({block:'start', behavior:'instant'})`);
   await wait(400);
   assert.equal(await evaluate(`story.dataset.scroll`), 'false');
   assert.equal(await evaluate(`scene.dataset.stage`), '4');
   assert.ok(await evaluate(`document.documentElement.scrollWidth <= innerWidth`), 'mobile must have no horizontal page overflow');
-  const touchY = await evaluate(`rail.getBoundingClientRect().top + 100`);
-  await cdp('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 335, y: touchY }] });
-  for (let i = 1; i <= 8; i++) {
-    await cdp('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 335 - i * 32, y: touchY }] });
-    await wait(25);
+  for (const stage of [0, 1, 2, 3, 4]) {
+    await evaluate(`document.querySelectorAll('.story-controls button')[${stage}].click()`);
+    await until(`scene.dataset.stage === '${stage}'`);
+    assert.ok(await evaluate(`document.querySelector('.story-current-value').getBoundingClientRect().right <= innerWidth`), 'mobile value fits');
+    assert.ok(await evaluate(`document.querySelector('.story-caption-current .sr-only').textContent.includes(document.querySelector('.story-current-value').textContent)`), 'the decorative value has one semantic equivalent');
   }
-  await wait(100);
-  const held = await evaluate(`rail.scrollLeft`);
-  await wait(450);
-  assert.ok(Math.abs(await evaluate(`rail.scrollLeft`) - held) < 2, 'touch must not settle while the finger is still down');
-  await cdp('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await wait(2200);
-  assert.ok(await evaluate(`rail.scrollLeft`) > 200, 'mobile native swipe should advance the rail');
-  assert.ok(await evaluate(`[...document.querySelectorAll('.lifecycle-value')].every(e => e.scrollWidth <= e.clientWidth + 1)`), 'mobile numbers must fit');
+  const touchY = 400;
   const mobileY = await evaluate(`window.scrollY`);
   await cdp('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 195, y: touchY + 140 }] });
   for (let i = 1; i <= 6; i++) {
@@ -137,16 +99,12 @@ function send(method, params = {}, sessionId) {
   await cdp('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await wait(500);
   assert.ok(await evaluate(`window.scrollY`) > mobileY + 40, 'vertical touch scroll must remain native');
-  await evaluate(`rail.scrollIntoView({block:'center', behavior:'instant'})`);
-  await screenshot('mobile-rail');
-  console.log('PASS mobile native swipe, vertical touch scroll, stable receipt, number fit, no page overflow');
+  await screenshot('mobile-story');
+  console.log('PASS mobile stage controls, accessible values, native touch scroll and no page overflow');
 
   await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
   await wait(300);
-  assert.equal(await evaluate(`rail.dataset.motion`), 'false');
-  assert.equal(await evaluate(`getComputedStyle(rail).display`), 'grid');
-  assert.equal(await evaluate(`getComputedStyle(document.querySelector('.lifecycle-navigation')).display`), 'none');
-  assert.equal(await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).animationName`), 'none');
+  assert.equal(await evaluate(`story.dataset.scroll`), 'false');
   assert.equal(await evaluate(`scene.dataset.stage`), '4');
   assert.ok(await evaluate(`document.documentElement.scrollWidth <= innerWidth`));
   await screenshot('reduced-motion');

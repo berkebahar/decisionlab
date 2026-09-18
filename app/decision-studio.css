@@ -1,0 +1,176 @@
+/* Decorative type occupies existing space. It never participates in page height. */
+.editorial-type { position: absolute; inset: auto 0 0; overflow: clip; pointer-events: none; user-select: none; color: #dccb9f; opacity: .09; font-family: var(--font-editorial); font-size: clamp(72px, 12vw, 180px); line-height: 1; letter-spacing: -.045em; }
+.editorial-type-track { display: flex; width: max-content; }
+.editorial-type-track > span { flex: none; white-space: pre; }
+.editorial-home .cost-story-scene > .editorial-type { z-index: -1; bottom: 12px; mask-image: linear-gradient(transparent, #000 65%); }
+
+@media screen {
+  /* One compact forest entrance; the interaction surface stays quiet and opaque. */
+  .decision-studio { background: var(--background); }
+  .workspace-entrance { --foreground: #f7f4ed; --muted: #d5dfd2; position: relative; isolation: isolate; overflow: clip; background: #123c32; color: #f7f4ed; }
+  .workspace-entrance .workspace-botanical { position: absolute; z-index: -3; inset: 0; }
+  .workspace-entrance .workspace-botanical img { object-fit: cover; object-position: 70% 48%; opacity: .48; }
+  .workspace-entrance .workspace-botanical::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #10291ff5 12%, #123c32b3 65%, #123c3270); }
+  .workspace-entrance > .editorial-type { z-index: -2; inset: auto 0 8px 45%; font-size: clamp(100px, 14vw, 200px); opacity: .1; }
+  .workspace-entrance > .botanical-shade { position: absolute; z-index: -1; inset: 0; overflow: clip; pointer-events: none; color: #091b12; opacity: .45; }
+  .workspace-entrance .botanical-shade svg { position: absolute; width: min(760px, 68vw); height: auto; right: -60px; top: -95px; }
+  .workspace-entrance .botanical-shade-stem { stroke: currentColor; stroke-width: 1.5; }
+  .workspace-entrance .botanical-shade-leaves { fill: currentColor; }
+  .workspace-entrance .page-heading { padding-block: 24px 62px; }
+  .workspace-entrance .page-context { margin-bottom: 24px; color: #d5dfd2; font-size: 12px; }
+  .workspace-entrance .page-context a { color: inherit; }
+  .workspace-entrance .eyebrow { color: #dccb9f; letter-spacing: .12em; text-transform: uppercase; }
+  .workspace-entrance .status-dot { display: none; }
+  .workspace-entrance .page-heading h1 { max-width: 17ch; margin-block: 12px 0; color: inherit; font-size: clamp(40px, 4.6vw, 66px); font-weight: 400; line-height: 1.06; letter-spacing: -.04em; }
+  .workspace-entrance .page-heading > p:last-child { max-width: 52ch; margin-top: 20px; color: #d5dfd2; font-size: 15px; line-height: 1.7; }
+  .workspace-entrance :focus-visible { outline-color: #ead7a9; }
+  .decision-studio .studio-workspace { position: relative; padding-top: 32px; }
+
+  /* A single ivory writing surface, with no glass or animation behind the fields. */
+  .analyze-studio .product-form {
+    --foreground: #17221e; --muted: #505d55; --surface: #fbf9f3; --surface-soft: #f0ede3;
+    --border: #d4d4c6; --blue: #123c32; --blue-hover: #204e41; --focus: #376953;
+    --disabled-text: #566058; --disabled-surface: #e5e7de; --danger: #a23846;
+    color-scheme: light; color: var(--foreground); background: #f7f4ed;
+    position: relative; max-width: 920px; margin-top: -56px; padding: 24px clamp(20px, 3.5vw, 44px) 28px;
+    border: 0; border-top: 2px solid var(--champagne); border-radius: 2px;
+    box-shadow: 0 20px 50px -40px #10291f70;
+  }
+  .analyze-studio .product-local-note { position: relative; margin: 0 auto 24px; max-width: 920px; }
+  .analyze-studio .product-local-note + .product-form,
+  .analyze-studio .product-error ~ .product-form { margin-top: 0; }
+  .analyze-studio .product-steps { gap: 8px; }
+  .analyze-studio .product-steps :is(button, .product-step-receipt) { justify-content: flex-start; align-items: center; flex-wrap: nowrap; padding: 10px 0; border: 0; font-size: 12px; text-align: left; line-height: 1.4; }
+  .analyze-studio .product-steps :is(button, .product-step-receipt) > span { display: inline-grid; place-items: center; flex: 0 0 26px; width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 50%; font-size: 11px; }
+  .analyze-studio .product-steps button[data-complete="true"] > span { border-color: #87927c; background: #e4eee5; color: #123c32; }
+  .analyze-studio .product-steps button[aria-current="step"] { color: #123c32; font-weight: 650; }
+  .analyze-studio .product-steps button[aria-current="step"] > span { background: #123c32; color: #f7f4ed; border-color: #123c32; box-shadow: 0 0 0 3px #123c3210; }
+  .analyze-studio .product-steps button:disabled { opacity: 1; color: #6b736c; }
+  .analyze-studio .product-step-progress { height: 2px; margin-top: 8px; }
+  .analyze-studio .product-form-heading { margin-block: 24px; }
+  .analyze-studio .product-form-heading .eyebrow { color: #735a2f; font-size: 11px; letter-spacing: .08em; }
+  .analyze-studio .product-form-heading h2 { margin-block: 8px 10px; font-size: clamp(28px, 3vw, 36px); }
+  .analyze-studio .product-fields { gap: 20px 28px; }
+  .analyze-studio .product-field label { font-size: 14px; }
+  .analyze-studio .product-form :is(input, select, textarea) { border-radius: 3px; background: #fbf9f3; border-color: #bfc4b7; }
+  .analyze-studio .product-form :is(input, select, textarea):focus-visible { outline: 2px solid #376953; outline-offset: 2px; border-color: #376953; box-shadow: 0 0 0 4px #37695312; }
+  .analyze-studio .product-form :is(.button-outline, .button-quiet) { color: #123c32; }
+  .analyze-studio .product-form .button-outline:hover { background: #e5e7de; }
+  .analyze-studio .product-form > .product-actions { margin-top: 24px; padding-top: 20px; }
+
+  /* The finished receipt becomes the light object within a forest surround. */
+  .analyze-studio:has(.analysis-result) { --foreground: #f1f0e7; --muted: #bfccbe; --border: #4b6455; --blue: #d2dfc4; --focus: #ead7a9; background: #142e24; color: var(--foreground); }
+  .analyze-studio:has(.analysis-result) .workspace-entrance { background: #10291f; }
+  .analyze-studio .analysis-result { max-width: 1100px; margin-inline: auto; gap: clamp(28px, 4vw, 64px); }
+  .analyze-studio .analysis-result > .true-receipt { background: #f7f4ed; box-shadow: 0 24px 60px -32px #0009; }
+  .analyze-studio .receipt-next { padding-top: 20px; border-top: 1px solid #b59a64; }
+  .analyze-studio .receipt-next > .eyebrow { color: #dccb9f; font-size: 11px; letter-spacing: .06em; }
+  .analyze-studio .receipt-next .product-actions { gap: 12px; }
+  .analyze-studio .receipt-next .button-primary { background: #eee7d7; color: #123c32; border-color: #eee7d7; }
+  .analyze-studio .receipt-next .button-primary:hover { background: #fbf9f3; }
+  .analyze-studio .receipt-next .button-outline { color: #f7f4ed; border-color: #859779; }
+  .analyze-studio .receipt-next .button-outline:hover { background: #234133; }
+
+  /* Queue is an editorial ledger: status, identity, two estimates, then actions. */
+  .queue-studio .workspace-entrance .page-heading { padding-bottom: 40px; }
+  .queue-studio .workspace-entrance .page-heading h1 { max-width: 19ch; }
+  .queue-studio .studio-workspace { max-width: 1100px; }
+  .queue-studio .product-local-note { font-size: 12px; max-width: 74ch; }
+  .queue-studio .product-toolbar { gap: 20px 28px; padding-bottom: 24px; margin-bottom: 0; align-items: center; }
+  .queue-studio .product-toolbar > .product-field { margin-left: auto; flex: 0 1 280px; }
+  .queue-studio .product-toolbar label { font-size: 12px; }
+  .queue-studio .queue-card { padding-block: 30px; }
+  .queue-studio .queue-card > header { gap: 24px; }
+  .queue-studio .queue-card h2 { font-size: clamp(28px, 3vw, 38px); max-width: 34ch; margin-block: 14px 22px; }
+  .queue-studio .queue-state { gap: 12px; font-size: 12px; }
+  .queue-studio .queue-state > span:last-child { color: var(--muted); }
+  .queue-studio .decision-status { display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px; font-size: 11px; line-height: 1.5; border-radius: 2px; border: 1px solid var(--border); color: var(--foreground); background: transparent; }
+  .queue-studio .decision-status::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+  .queue-studio .decision-status[data-status="considering"] { background: var(--surface-soft); border-color: #87927c; }
+  .queue-studio .decision-status[data-status="postponed"] { border-color: #b59a64; border-style: dashed; }
+  .queue-studio .decision-status[data-status="bought"] { background: #123c32; border-color: #527164; color: #f7f4ed; }
+  .queue-studio .decision-status[data-status="skipped"] { color: var(--muted); }
+  .queue-studio .decision-status[data-status="skipped"]::before { background: transparent; border: 1px solid currentColor; }
+  .queue-studio .queue-estimates { display: flex; flex-wrap: wrap; gap: 20px 44px; margin: 0; }
+  .queue-studio .queue-estimates > div { min-width: 0; max-width: 100%; }
+  .queue-studio .queue-estimates dt { color: var(--muted); font-size: 11px; line-height: 1.6; }
+  .queue-studio .queue-estimates dd { margin: 6px 0 0; font-size: clamp(24px, 2.7vw, 34px); letter-spacing: -.035em; line-height: 1.2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .queue-studio .queue-estimates > div + div dd { font-size: clamp(20px, 2.3vw, 28px); color: var(--muted); }
+  .queue-studio .queue-date { margin-top: 4px; border-left-width: 1px; }
+  .queue-studio .queue-date time { font-size: 15px; color: var(--foreground); }
+  .queue-studio .queue-actions { justify-content: space-between; gap: 8px 24px; }
+  .queue-studio :is(.queue-receipt-actions, .queue-secondary-actions) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+  .queue-studio .queue-secondary-actions .button-quiet { font-size: 13px; padding-inline: 10px; }
+  .queue-studio .queue-edit > summary { font-size: 14px; }
+  .queue-studio .queue-edit > summary > span { margin-left: 12px; font-size: 12px; font-weight: 400; color: var(--muted); }
+  .queue-studio .queue-card > details { margin-top: 20px; border-top-style: solid; }
+  .queue-studio .queue-receipt > summary { color: var(--muted); font-size: 14px; }
+  .queue-studio .queue-receipt .true-receipt { max-width: 760px; padding: clamp(20px, 4vw, 40px); box-shadow: 0 18px 40px -32px #10291f60; }
+  .queue-studio .queue-card > .delete-button { font-size: 12px; color: var(--muted); }
+  .queue-studio .queue-card > .delete-button:hover { color: var(--danger); }
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  .editorial-home .editorial-type-loop[data-ambient="true"] .editorial-type-track { animation: editorial-type-drift 90s linear infinite; animation-play-state: paused; }
+  .editorial-home .editorial-type-loop[data-ambient-active="true"] .editorial-type-track { animation-play-state: running; }
+  .editorial-home[data-atmosphere-paused="true"] .editorial-type-loop .editorial-type-track,
+  .editorial-home[data-atmosphere-hidden="true"] .editorial-type-loop .editorial-type-track { animation-play-state: paused; }
+  /* Utility entrances move once, for under five seconds; fields never drift. */
+  .workspace-entrance .editorial-type-track { animation: studio-type-settle 4s ease-out both; }
+  .analyze-studio { transition: background-color 260ms ease; }
+  .analyze-studio .product-step-progress::-webkit-progress-value { transition: width 220ms ease; }
+  .analyze-studio .product-stage { animation: studio-step-arrive 180ms ease-out; }
+  .analyze-studio .analysis-result > .true-receipt { animation: studio-paper-arrive 360ms cubic-bezier(.2,.65,.3,1); }
+  .queue-studio .queue-card { animation: saved-decision-settle 240ms ease-out; }
+  .queue-studio :is(.decision-status, .queue-date) { animation: studio-step-arrive 220ms ease-out; }
+  .queue-studio .queue-receipt[open] > .true-receipt { animation: studio-paper-arrive 220ms ease-out; }
+  @keyframes editorial-type-drift { to { transform: translateX(-50%); } }
+  @keyframes studio-type-settle { from { transform: translateX(24px); opacity: .5; } to { transform: none; opacity: 1; } }
+  @keyframes studio-step-arrive { from { opacity: .8; } to { opacity: 1; } }
+  @keyframes studio-paper-arrive { from { opacity: .85; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}
+
+@media screen and (max-width: 760px) {
+  .editorial-home .editorial-type { font-size: 72px; opacity: .055; }
+  .editorial-home .editorial-type-loop[data-ambient] .editorial-type-track,
+  .workspace-entrance .editorial-type-track { animation: none; transform: none; }
+  .workspace-entrance > .editorial-type { font-size: 100px; left: 25%; opacity: .065; }
+  .workspace-entrance .botanical-shade svg { width: 440px; right: -150px; top: -10px; }
+  .workspace-entrance .page-heading { padding-block: 20px 44px; }
+  .workspace-entrance .page-context { margin-bottom: 16px; }
+  .workspace-entrance .page-heading h1 { font-size: clamp(36px, 8.5vw, 48px); }
+  .workspace-entrance .page-heading > p:last-child { margin-top: 16px; font-size: 14px; }
+  .analyze-studio .product-form { margin-top: -44px; padding: 16px 18px 24px; }
+  .analyze-studio .product-steps { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr); gap: 4px; }
+  .analyze-studio .product-steps :is(button, .product-step-receipt) { flex-direction: column; justify-content: flex-start; text-align: center; min-height: 76px; min-width: 0; padding-block: 8px; font-size: 11px; gap: 6px; overflow-wrap: normal; }
+  .analyze-studio .product-steps .product-step-receipt { grid-column: auto; }
+  .analyze-studio .product-form-heading { margin-block: 20px; }
+  .analyze-studio .product-fields { gap: 20px; }
+  .queue-studio .workspace-entrance .page-heading { padding-bottom: 32px; }
+  .queue-studio .queue-card > header { flex-direction: column; }
+  .queue-studio .queue-card h2 { margin-bottom: 18px; }
+  .queue-studio .queue-estimates { gap: 16px 32px; }
+  .queue-studio .queue-date { padding-left: 12px; }
+  .queue-studio .queue-actions { flex-direction: column; align-items: stretch; }
+  .queue-studio .queue-receipt-actions > button { flex: 1 1 auto; padding-inline: 14px; }
+  .queue-studio .queue-edit > summary > span { display: block; margin: 4px 0 0; }
+}
+@media screen and (max-width: 520px) {
+  .analyze-studio .product-form { padding-inline: 0; border-top: 0; margin-top: -12px; box-shadow: none; background: transparent; }
+  .analyze-studio:not(:has(.analysis-result)) { --background: #f7f4ed; --foreground: #17221e; --muted: #505d55; --border: #d4d4c6; --blue: #123c32; --focus: #376953; --danger: #a23846; color-scheme: light; color: var(--foreground); }
+  .queue-studio .product-toolbar > .product-field { flex-basis: 100%; margin-left: 0; }
+  .queue-studio .queue-secondary-actions { gap: 4px; }
+  .queue-studio .queue-secondary-actions .button-quiet { padding-inline: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .editorial-type-track { animation: none !important; transform: none !important; }
+}
+@media (forced-colors: active) {
+  .editorial-type, .workspace-botanical, .workspace-entrance > .botanical-shade { display: none; }
+  .decision-studio .workspace-entrance, .analyze-studio .product-form, .analyze-studio:has(.analysis-result) { background: Canvas; color: CanvasText; }
+  .workspace-entrance .page-heading :is(h1, p, a, span), .queue-studio .decision-status { color: CanvasText; }
+  .analyze-studio .product-steps button[aria-current="step"] { outline: 2px solid Highlight; }
+}
+@media print {
+  .editorial-type, .workspace-botanical, .workspace-entrance > .botanical-shade { display: none !important; }
+}

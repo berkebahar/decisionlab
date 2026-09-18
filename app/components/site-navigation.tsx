@@ -58,7 +58,7 @@ export default function SiteNavigation() {
       <div className="drawer-content"><div className="drawer-heading"><span className="brand"><BrandMark />DecisionLab</span><button autoFocus className="icon-button" type="button" aria-label="Close navigation menu" onClick={close}><Icon name="close" /></button></div>
         <p className="eyebrow">Your decision workspace</p>
         <nav aria-label="Mobile navigation">{pages.map(([href, label], index) => <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined} onClick={close}><span className="nav-index">0{index + 1}</span>{label}<Icon name="arrow" size={18} /></Link>)}</nav>
-        <div className="support-links"><Link href="/dashboard" onClick={close}>Goals & saved decisions</Link><Link href="/goallens" onClick={close}>GoalLens</Link><Link href="/simulator" onClick={close}>Savings Simulator</Link></div><div className="drawer-note"><Icon name="target" /><p>Small decisions.<br /><strong>More possibilities.</strong></p></div>
+        <div className="support-links"><p className="eyebrow">Supporting tools</p><Link href="/dashboard" onClick={close}>Savings Goals</Link><Link href="/goallens" onClick={close}>GoalLens</Link><Link href="/simulator" onClick={close}>Savings Simulator</Link></div><div className="drawer-note"><Icon name="target" /><p>Small decisions.<br /><strong>More possibilities.</strong></p></div>
         <p className="drawer-credit">Created, designed, and developed by Berke Bahar.</p>
       </div>
     </dialog>

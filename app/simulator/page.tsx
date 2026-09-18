@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function SimulatorPage() {
   return <div className="container">
-    <PageHeading page="Simulator" eyebrow="THE WHAT-IF WORKSPACE" title="One goal. More possibilities.">A little less spending. A little more saving. Adjust your plan and see how the path to your goal changes.</PageHeading>
+    <PageHeading page="Savings Simulator" eyebrow="SUPPORTING TOOLS" title="One goal. More possibilities.">A little less spending. A little more saving. Adjust your plan and see how the path to your goal changes.</PageHeading>
     <ScenarioWorkspace />
   </div>;
 }

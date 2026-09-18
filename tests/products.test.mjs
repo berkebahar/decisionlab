@@ -33,6 +33,35 @@ test("zero uses produces no Infinity, and resale beyond costs cannot create nega
   assert.equal(JSON.stringify(result).includes("Infinity"), false);
   assert.equal(formatUnitCost(.0001, "USD"), "<$0.01");
 });
+test("the True Cost floor covers zero costs, equal resale, and resale above all ownership costs", () => {
+  const free = { ...analysis, price: 0, tax: 0, shipping: 0, maintenanceYearly: 0, accessories: 0, subscription: 0, repairs: 0, resale: 0 };
+  const gross = analyzeProduct({ ...analysis, resale: 0 }).net;
+  for (const input of [free, { ...free, resale: 100 }, { ...analysis, resale: gross }, { ...analysis, resale: gross + .01 }]) {
+    const result = analyzeProduct(input);
+    assert.equal(result.net, 0);
+    assert.equal(result.costPerUse, 0);
+    assert.equal(result.resaleDeduction, result.initial + result.ownership);
+    assert.equal(result.resaleCapped, input.resale > result.initial + result.ownership);
+    assert.equal(analyzeProduct({ ...input, uses: 0 }).costPerUse, null);
+  }
+  assert.equal(analyzeProduct({ ...analysis, resale: gross - .01 }).net, .01);
+});
+
+test("saved product analyses retain receipt assumptions; incomplete older records are preserved", () => {
+  const s = storage();
+  const saved = { ...record, analysis: { ...analysis, resale: 999 } };
+  saveProduct(s, saved);
+  const raw = s.getItem(PRODUCTS_STORAGE_KEY);
+  const restored = parseProducts(raw)[0];
+  assert.deepEqual(restored.analysis, saved.analysis);
+  assert.deepEqual(analyzeProduct(restored.analysis), analyzeProduct(saved.analysis));
+  assert.equal(analyzeProduct(restored.analysis).net, 0);
+  assert.equal(s.getItem(PRODUCTS_STORAGE_KEY), raw);
+  const incomplete = JSON.stringify({ version: 1, items: [{ ...record, analysis: { name: "Older incomplete record", price: 100 } }] });
+  s.setItem(PRODUCTS_STORAGE_KEY, incomplete);
+  assert.throws(() => parseProducts(incomplete), /preserved/);
+  assert.equal(s.getItem(PRODUCTS_STORAGE_KEY), incomplete);
+});
 test("missing optional expenses remain explicitly unknown rather than silently confirmed zero", () => {
   const result = analyzeProduct({ ...analysis, tax: null, shipping: null, maintenanceYearly: null, accessories: null, subscription: null, repairs: null, resale: null });
   assert.equal(result.initial, 100); assert.equal(result.net, 100); assert.equal(result.missing.length, 7);

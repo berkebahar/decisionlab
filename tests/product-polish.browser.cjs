@@ -11,7 +11,7 @@ const browser = spawn(chrome, ['--headless', '--no-sandbox', '--disable-gpu', '-
 let sequence = 0, buffer = '';
 const pending = new Map();
 const stop = () => { try { process.kill(-browser.pid, 'SIGKILL'); } catch {} };
-const deadline = setTimeout(() => { console.error('TIMEOUT: product polish browser checks (180 seconds)'); stop(); process.exitCode = 1; }, 180000);
+const deadline = setTimeout(() => { console.error('TIMEOUT: product polish browser checks (240 seconds)'); stop(); process.exitCode = 1; }, 240000);
 browser.stdio[4].on('data', chunk => {
   buffer += chunk.toString();
   let split;
@@ -60,12 +60,13 @@ function send(method, params = {}, sessionId) {
       const visible = e => e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden';
       return {
         overflow: document.documentElement.scrollWidth > innerWidth + 1,
-        clipped: [...document.querySelectorAll('.receipt-amount, .comparison-primary-metric dd, .actual-pair dd, .lifecycle-value')].filter(visible).filter(e => e.scrollWidth > e.clientWidth + 2).map(e => e.textContent),
+        overflowDetails: [...document.querySelectorAll('main *')].filter(visible).filter(e => e.getBoundingClientRect().right > innerWidth + 1 || e.getBoundingClientRect().left < -1).map(e => ({ tag: e.tagName, className: e.getAttribute('class'), x: e.getBoundingClientRect().x, width: e.getBoundingClientRect().width })).slice(0, 20),
+        clipped: [...document.querySelectorAll('.receipt-amount, .comparison-primary-metric dd, .actual-pair dd, .queue-estimates dd, .lifecycle-value')].filter(visible).filter(e => e.scrollWidth > e.clientWidth + 2).map(e => e.textContent),
         labels: [...document.querySelectorAll('main input, main select, main textarea')].filter(visible).filter(e => !e.labels?.length && !e.getAttribute('aria-label')).map(e => e.id),
         small: [...document.querySelectorAll('main button, main summary, main input:not([type="checkbox"]), main select')].filter(visible).filter(e => e.getBoundingClientRect().height < 43).map(e => e.textContent || e.id),
       };
     })()`);
-    assert.equal(state.overflow, false, `${label}: page overflow`);
+    assert.equal(state.overflow, false, `${label}: page overflow ${JSON.stringify(state.overflowDetails)}`);
     assert.deepEqual(state.clipped, [], `${label}: clipped number`);
     assert.deepEqual(state.labels, [], `${label}: unlabelled field`);
     assert.deepEqual(state.small, [], `${label}: small tap target`);
@@ -94,6 +95,18 @@ function send(method, params = {}, sessionId) {
   await until(`document.querySelector('.product-status')?.textContent.includes('saved')`);
   await navigate('/queue');
   assert.ok(await evaluate(`document.querySelector('.decision-status').dataset.status === 'considering'`));
+  const savedBeforeReceipt = await evaluate(`localStorage.getItem('decisionlab.products.v1')`);
+  await click('.queue-card .product-actions button:first-child');
+  assert.ok(await evaluate(`document.querySelector('.queue-receipt').open`), 'View Receipt opens the saved receipt');
+  assert.equal(await evaluate(`document.activeElement.textContent`), 'True Cost Receipt', 'saved receipt receives focus');
+  assert.equal(await evaluate(`document.querySelector('.queue-receipt .receipt-total .receipt-amount').textContent`), '$899.00');
+  await evaluate(`window.printCalls = 0; window.print = () => { window.printCalls++; }; document.querySelector('.queue-receipt').open = false;`);
+  await click('.queue-card .product-actions button:nth-child(2)');
+  assert.equal(await evaluate(`window.printCalls`), 1, 'Print Receipt reuses the receipt print action once, even while collapsed');
+  assert.equal(await evaluate(`document.querySelector('.receipt-print-root .receipt-total .receipt-amount').textContent`), '$899.00');
+  await evaluate(`window.dispatchEvent(new Event('afterprint'))`);
+  assert.equal(await evaluate(`document.querySelector('.receipt-print-root')`), null, 'print snapshot is cleaned up');
+  assert.equal(await evaluate(`localStorage.getItem('decisionlab.products.v1')`), savedBeforeReceipt, 'viewing and printing never modify saved data');
   await click('.queue-card > details > summary');
   await input('.queue-decision select', 'bought');
   await click('.queue-decision button[type="submit"]');
@@ -121,21 +134,22 @@ function send(method, params = {}, sessionId) {
   const cases = [
     ['/', 'home'], ['/analyze', 'analyze'], ['/analyze?id=polish-bought', 'receipt'], ['/compare?demo=0', 'compare'], ['/queue', 'queue'], ['/purchases', 'purchases'], ['/insights', 'insights'], ['/about', 'about'], ['/dashboard', 'dashboard'], ['/goallens', 'goallens'], ['/simulator', 'simulator'],
   ];
-  for (const width of [390, 375, 320, 1440]) {
+  for (const width of [1440, 1200, 1024, 768, 390, 320]) {
     await cdp('Emulation.setDeviceMetricsOverride', { width, height: width === 1440 ? 1000 : 844, deviceScaleFactor: 1, mobile: width < 760 });
     for (const [path, name] of cases) {
       await navigate(path);
       if (name === 'home') {
         assert.equal(await evaluate(`document.querySelector('.editorial-further-reading')`), null);
-        await evaluate(`document.querySelector('.lifecycle-heading').scrollIntoView({behavior:'instant'})`);
-        await until(`getComputedStyle(document.querySelector('.lifecycle-type-track')).animationPlayState === 'running'`);
-        assert.equal(await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).animationName`), 'lifecycle-type-drift');
-        const beforeDrift = await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).transform`);
-        await wait(150);
-        assert.notEqual(await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).transform`), beforeDrift, 'ambient words must keep moving');
-        await click('.rain-toggle');
-        assert.equal(await evaluate(`getComputedStyle(document.querySelector('.lifecycle-type-track')).animationPlayState`), 'paused');
-        await click('.rain-toggle');
+        assert.equal(await evaluate(`document.querySelector('.cost-lifecycle')`), null, 'the repeated explainer is removed');
+        assert.equal(await evaluate(`document.querySelectorAll('.true-receipt').length`), 1, 'one real receipt on the homepage');
+        assert.ok(await evaluate(`document.querySelector('.story-instrument').inert && document.querySelector('.story-instrument').getAttribute('aria-hidden') === 'true'`));
+        assert.ok(await evaluate(`document.querySelector('.story-caption-outgoing').inert && document.querySelector('.story-caption-outgoing').getAttribute('aria-hidden') === 'true'`));
+        assert.equal(await evaluate(`document.querySelectorAll('.story-caption-outgoing h3').length`), 0, 'outgoing text is not another heading');
+        const { nodes } = await cdp('Accessibility.getFullAXTree');
+        const headings = nodes.filter(node => !node.ignored && node.role?.value === 'heading').map(node => node.name?.value);
+        assert.equal(headings.filter(name => name === 'True Cost Receipt').length, 1, 'one accessible receipt heading');
+        assert.equal(headings.filter(name => name === 'One complete estimate.').length, 0, 'illustration is excluded from the accessibility tree');
+        assert.equal(await evaluate(`document.querySelectorAll('[aria-hidden="true"] button, [aria-hidden="true"] a, [aria-hidden="true"] input').length`), 0, 'no focusable duplicates in decorative content');
         await evaluate(`window.scrollTo({top:0, behavior:'instant'})`);
       }
       if (name === 'compare') {
@@ -187,14 +201,29 @@ function send(method, params = {}, sessionId) {
   console.log('PASS reduced motion, dark theme, honest empty/error states, preserved invalid storage');
   // Hold hydration to inspect the real server fallback; no delay is added to the app.
   await cdp('Emulation.setScriptExecutionDisabled', { value: true });
-  await cdp('Page.navigate', { url: (process.env.BASE_URL || 'http://localhost:3100') + '/compare' });
-  await until(`document.readyState === 'complete' && document.querySelector('.skeleton-panel')`);
-  assert.ok(await evaluate(`document.querySelector('.skeleton-caption').textContent.includes('Preparing')`));
-  assert.equal(await evaluate(`getComputedStyle(document.querySelector('.skeleton-paper')).animationName`), 'none');
-  await layout('320px server loading fallback');
+  for (const width of [1440, 1200, 1024, 768, 390, 320]) {
+    await cdp('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 760 });
+    for (const path of ['/analyze', '/compare', '/queue', '/purchases', '/insights', '/dashboard', '/goallens', '/simulator']) {
+      await cdp('Page.navigate', { url: (process.env.BASE_URL || 'http://localhost:3100') + path });
+      await until(`document.readyState === 'complete' && document.querySelector('.skeleton-panel')`);
+      assert.ok(await evaluate(`document.querySelector('.skeleton-caption').textContent.includes('Preparing')`));
+      assert.ok(await evaluate(`document.querySelector('.skeleton-help').textContent.includes('DecisionLab needs JavaScript enabled')`));
+      assert.ok(await evaluate(`document.querySelector('.skeleton-help a').getAttribute('href') === ''`));
+      assert.ok(await evaluate(`document.querySelector('.workspace-fallback')?.textContent.includes('JavaScript enabled')`), 'no-script guidance remains visible');
+      assert.equal(await evaluate(`getComputedStyle(document.querySelector('.skeleton-paper')).animationName`), 'none');
+      await layout(`${width}px ${path} server loading fallback`);
+    }
+  }
   await screenshot('loading-fallback-320');
   await cdp('Emulation.setScriptExecutionDisabled', { value: false });
-  console.log(`PASS branded loading fallback without motion. Screenshots: ${artifacts}`);
+  // Scripts can fail to download even when JavaScript is enabled: keep useful SSR guidance.
+  await cdp('Network.enable');
+  await cdp('Network.setBlockedURLs', { urls: ['*/_next/static/*.js*'] });
+  await cdp('Page.navigate', { url: (process.env.BASE_URL || 'http://localhost:3100') + '/analyze' });
+  await until(`document.readyState === 'complete' && document.querySelector('.skeleton-help')`);
+  assert.ok(await evaluate(`document.querySelector('.skeleton-help').textContent.includes('reload this page')`));
+  await layout('320px blocked hydration');
+  console.log(`PASS all six widths, no-JavaScript and blocked hydration fallbacks. Screenshots: ${artifacts}`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => {
   clearTimeout(deadline); for (const { timeout } of pending.values()) clearTimeout(timeout); stop();
 });

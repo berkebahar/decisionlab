@@ -8,6 +8,7 @@ import "./pointer-light.css";
 import "./editorial-workspaces.css";
 import "./products/receipt-interactions.css";
 import "./interaction-polish.css";
+import "./decision-studio.css";
 import PointerLight from "./components/pointer-light";
 import SiteNavigation from "./components/site-navigation";
 import SiteFooter from "./components/site-footer";
@@ -42,7 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <PrivacyAnalytics />
         <a className="skip-link" href="#main">Skip to content</a>
         <SiteNavigation />
-        <main id="main" tabIndex={-1}>{children}</main>
+        <main id="main" tabIndex={-1}><noscript><p className="container workspace-fallback">DecisionLab needs JavaScript enabled to open its workspaces. Enable JavaScript, then reload this page. Your saved data stays in this browser.</p></noscript>{children}</main>
         <SiteFooter />
         <PointerLight />
       </body>

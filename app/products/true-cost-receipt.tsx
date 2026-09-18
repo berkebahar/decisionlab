@@ -39,7 +39,7 @@ export default function TrueCostReceipt({ analysis: a, demo = false, compact = f
   }
   return <article ref={receipt} className={`true-receipt ${compact ? "receipt-compact" : ""}`} aria-labelledby={heading}>
     <header className="receipt-heading"><p className="eyebrow">DecisionLab / {demo ? "Fictional demonstration" : "Your estimates"}</p><h2 id={heading} tabIndex={-1}>True Cost Receipt</h2><p>{a.name}{a.model ? ` · ${a.model}` : ""}</p><span>{a.condition} · {a.currency} · {r.months} months planned ownership</span></header>
-    {demo && <p className="product-notice">Fictional example · not market prices. Nothing is saved.</p>}
+    {demo && !compact && <p className="product-notice">Fictional example · not market prices. Nothing is saved.</p>}
     {compact ? <dl className="receipt-lines receipt-overview">
       <ReceiptLine label="Sticker price">{money(a.price)}</ReceiptLine>
       {a.tax !== 0 && <ReceiptLine label="+ Tax">{optional(a.tax)}</ReceiptLine>}
@@ -55,7 +55,7 @@ export default function TrueCostReceipt({ analysis: a, demo = false, compact = f
     </div>
     {!compact && (a.alternative || a.goal) && <dl className="receipt-lines"><div><dt>Purchase-price difference from alternative</dt><dd>{r.alternativeDifference === null ? "No alternative entered" : `${r.alternativeDifference >= 0 ? "+" : "−"}${money(Math.abs(r.alternativeDifference))}`}</dd></div>{a.alternative && <div><dt>Alternative</dt><dd>{a.alternative.name} · {money(a.alternative.price)}</dd></div>}<div><dt>Selected goal / upfront impact</dt><dd>{!r.goal ? "Not included" : r.goal.delay === null ? "Goal cannot be reached under these assumptions" : `+${formatQuantity(r.goal.delay)} ${r.goal.unit}s`}</dd></div></dl>}
     {!compact && <ProductScore analysis={a} />}
-    <p className="receipt-note">{r.missing.length ? "Incomplete estimate: unknown costs are excluded, not treated as zero." : "Based on your estimates, not verified prices."} {!compact && r.ongoingShare >= .25 && "Ongoing costs are at least 25% of modeled gross cost."}{!compact && " Cost per use depends on expected usage."}</p>
+    <p className="receipt-note">{demo && compact && "Fictional example, not market prices. "}{r.missing.length ? "Incomplete estimate: unknown costs are excluded, not treated as zero." : "Based on your estimates, not verified prices."} {!compact && r.ongoingShare >= .25 && "Ongoing costs are at least 25% of modeled gross cost."}{!compact && " Cost per use depends on expected usage."}</p>
     {r.resaleCapped && <p className="product-notice">Entered resale exceeds modeled costs. The deduction is capped at those costs; net cost is floored at zero, not treated as profit.</p>}
     {compact && <details className="receipt-breakdown"><summary>Full cost breakdown</summary>
       {breakdown}
@@ -64,6 +64,7 @@ export default function TrueCostReceipt({ analysis: a, demo = false, compact = f
       <p>Inputs are your estimates. Totals and cost per use are DecisionLab calculations. {r.missing.length ? `Unknown or excluded: ${r.missing.join(", ")}.` : "No cost inputs are missing."}</p>
       <p>Ownership: {a.duration} {a.durationUnit}; usage: {a.uses} per {a.useFrequency}. Years use 12 months and 52 weeks. Weekly usage is spread evenly across months. These are expectations, not durability guarantees.</p>
       <p>Initial = price + tax + shipping. Ownership expenses = yearly maintenance × months ÷ 12 + accessories/consumables for the whole period + subscription × months (÷ 12 for an annual rate) + repair allowance. Net = max(0, initial + ownership expenses − resale). Uses = frequency × duration. Cost per use = net ÷ uses; unavailable at zero uses.</p>
+      <p>True Cost is floored at {money(0)}. DecisionLab does not model profit or appreciation if expected resale exceeds total ownership cost.</p>
       <p>Currency is {a.currency}; no exchange-rate conversion. Amounts round to cents; estimates do not become more certain because they have decimal places. No inflation, interest, financing, energy, insurance, disposal fees, or other costs are included unless entered in the relevant cost allowances.</p>
       <p>Alternative differences compare purchase prices only, not ownership value. Use Compare for a fuller comparison. Importance {a.importance}/5 and usefulness {a.usefulness}/5 are your subjective assessments, never a scientific buying score.</p>
       {a.goal && <p>Goal: {a.goal.name}, {money(a.goal.saved)} saved toward {money(a.goal.target)}, adding {money(a.goal.contribution)} per {a.goal.frequency}. Count end-of-{a.goal.frequency} deposits, first in one {a.goal.frequency}. Baseline = ceil(max(0, target − saved) ÷ contribution); with purchase = ceil(max(0, target − saved + initial cost) ÷ contribution). Delay is the difference. Only upfront cost is included: future expenses and resale occur at unknown times. Contributions are after other expenses and exclude this purchase. Spending beyond available savings is hypothetical future spending, not assumed borrowing.</p>}

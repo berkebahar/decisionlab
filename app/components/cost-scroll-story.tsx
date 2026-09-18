@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { glide } from "./cost-motion";
 import BotanicalShade from "./botanical-shade";
+import EditorialType from "./editorial-type";
 import { storyAssumptions, storyIndex, storyMoney, storyProduct, storyResult, storyStages, storyUnitCost } from "./cost-story-model";
 
 export default function CostScrollStory() {
@@ -55,6 +56,7 @@ export default function CostScrollStory() {
       if (!frame) frame = requestAnimationFrame(animate);
     };
     const configure = () => {
+      element.dataset.interactive = "true";
       enhanced.current = eligible.matches;
       element.dataset.scroll = String(eligible.matches);
       size();
@@ -88,6 +90,7 @@ export default function CostScrollStory() {
       window.removeEventListener("scroll", schedule); window.removeEventListener("resize", resized);
       document.removeEventListener("visibilitychange", visibility); eligible.removeEventListener("change", configure);
       enhanced.current = false;
+      delete element.dataset.interactive;
     };
   }, []);
 
@@ -114,6 +117,7 @@ export default function CostScrollStory() {
   }, [stage]);
   return <section ref={root} className="cost-scroll-story" id="cost-story" aria-labelledby="cost-story-heading" data-scroll="false">
     <div ref={scene} className="cost-story-scene" data-stage={stage}>
+      <EditorialType words="BUY · OWN · USE · RESELL · TRUE COST" loop />
       <div className="story-foreground" aria-hidden="true"><BotanicalShade placement="hero" /></div>
       <div className="container cost-story-layout">
         <div className="cost-story-copy">
@@ -125,18 +129,17 @@ export default function CostScrollStory() {
           </div>
           <p className="story-scroll-hint">Scroll to follow the story, or choose a stage.</p>
           <div className="story-caption" key={stage}>
-            <div className="story-caption-current"><h3>{current.title}</h3><p>{current.detail}</p></div>
-            <div className="story-caption-outgoing" aria-hidden="true"><h3>{prior.title}</h3><p>{prior.detail}</p></div>
+            <div className="story-caption-current"><h3>{current.title}</h3><p>{current.detail}</p><p className="sr-only">{current.caption}: {current.value}</p></div>
+            <div className="story-caption-outgoing" aria-hidden="true" inert><p className="story-caption-title">{prior.title}</p><p>{prior.detail}</p></div>
           </div>
-          <div className="story-links"><Link className="text-link" href="/analyze">Analyze your own product →</Link><a href="#cost-explorer" className="text-link">Skip to the cost explorer ↓</a></div>
+          <div className="story-links"><Link className="text-link" href="/analyze">Analyze your own product →</Link><a href="#receipt-preview" className="text-link">Try the receipt ↓</a></div>
           <p className="sr-only" role="status">{announcement}</p>
         </div>
-        <figure className="story-instrument" aria-label={`${current.caption}: ${current.value}`}>
+        <figure className="story-instrument" aria-hidden="true" inert>
           <div className="story-media" aria-hidden="true"><Image src="/images/decisionlab-botanical-hero.webp" alt="" fill sizes="(min-width: 1000px) 60vw, 100vw" /><div className="story-media-rules" /></div>
           <div className="story-paper" aria-hidden="true" />
           <div className="story-document" hidden={stage !== 4}>
-            <p className="eyebrow">DecisionLab / Fictional camera</p><h3>True Cost Receipt</h3>
-            <dl><div><dt>Sticker price</dt><dd>{storyMoney(storyProduct.price)}</dd></div><div><dt>Accessories</dt><dd>+{storyMoney(storyProduct.accessories!)}</dd></div><div><dt>Maintenance · 24 months</dt><dd>+{storyMoney(storyResult.maintenance)}</dd></div><div><dt>Subscriptions · 24 months</dt><dd>+{storyMoney(storyResult.subscriptions)}</dd></div><div><dt>Expected resale</dt><dd>−{storyMoney(storyResult.resaleDeduction)}</dd></div></dl>
+            <p className="eyebrow">Fictional camera / 24 months</p><p className="story-document-title">One complete estimate.</p>
           </div>
           <div className="story-figure"><span key={stage} className="story-figure-label">{current.caption}</span><strong ref={number}><span key={current.value} className="story-current-value">{current.value}</span><span key={`previous-${stage}`} className="story-outgoing-value" aria-hidden="true">{prior.value !== current.value ? prior.value : ""}</span></strong></div>
           <div className="story-material-caption" aria-hidden="true">

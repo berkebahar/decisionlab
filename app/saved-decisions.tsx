@@ -48,13 +48,13 @@ export default function SavedDecisions() {
   return (
     <section className="saved-section container" id="saved-decisions" aria-labelledby="saved-heading">
       <div className={styles.sectionHeader}><div className="section-intro">
-        <p className="eyebrow">YOUR DECISIONS, IN PERSPECTIVE</p>
-        <h2 id="saved-heading" ref={heading} tabIndex={-1}>Saved decisions {decisions.length > 0 && <span className={styles.count}>{decisions.length}</span>}</h2>
+        <p className="eyebrow">SAVED WITH GOALLENS</p>
+        <h2 id="saved-heading" ref={heading} tabIndex={-1}>Saved GoalLens comparisons {decisions.length > 0 && <span className={styles.count}>{decisions.length}</span>}</h2>
         <p>Keep hypothetical comparisons and optionally record what you chose. These records are specific to this browser and device; clearing browser data can erase them.</p>
       </div><Link href="/goallens" className={styles.newDecision}><Icon name="plus" size={17} />New comparison</Link></div>
       <p className="storage-message" role="status">{error || message}</p>
-      {snapshot === undefined && <Skeleton label="Loading your decisions…" />}
-      {snapshot !== undefined && !error && decisions.length === 0 && <div className={`empty-state ${styles.empty}`}><BrandMark className={styles.emptyBrand} /><span className={styles.emptyEyebrow}>YOUR DECISION JOURNAL</span><h3>A little perspective to come back to.</h3><p>No saved decisions yet. Explore a trade-off in GoalLens and select “Save comparison” to keep a snapshot here.</p><Link className="button-outline" href="/goallens">Explore GoalLens <Icon name="arrow" size={17} /></Link></div>}
+      {snapshot === undefined && <Skeleton label="Preparing your GoalLens comparisons" />}
+      {snapshot !== undefined && !error && decisions.length === 0 && <div className={`empty-state ${styles.empty}`}><BrandMark className={styles.emptyBrand} /><span className={styles.emptyEyebrow}>YOUR DECISION JOURNAL</span><h3>A little perspective to come back to.</h3><p>No saved GoalLens comparisons yet. Explore a trade-off in GoalLens and select “Save comparison” to keep a snapshot here.</p><Link className="button-outline" href="/goallens">Explore GoalLens <Icon name="arrow" size={17} /></Link></div>}
       <div className={styles.grid}>
         {decisions.map((decision) => (
           <article className={`saved-card ${styles.card}`} key={decision.id}>
