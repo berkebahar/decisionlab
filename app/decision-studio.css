@@ -5,8 +5,52 @@
 .editorial-home .cost-story-scene > .editorial-type { z-index: -1; bottom: 12px; mask-image: linear-gradient(transparent, #000 65%); }
 
 @media screen {
-  /* One compact forest entrance; the interaction surface stays quiet and opaque. */
-  .decision-studio { background: var(--background); }
+  /* The forest surround continues through the workspace, in either theme. */
+  .decision-studio {
+    --foreground: #f1f0e7; --muted: #bfccbe; --border: #637567;
+    --surface: #203c30; --surface-soft: #294638; --blue: #d2dfc4; --focus: #ead7a9;
+    --danger: #f0aeb3; --primary: #123c32; --primary-hover: #204e41;
+    position: relative; isolation: isolate; overflow: clip; min-height: 85vh;
+    color-scheme: dark; color: var(--foreground); background: #142e24;
+  }
+  .decision-studio::before, .decision-studio::after {
+    content: ""; position: absolute; z-index: -1; pointer-events: none;
+  }
+  .decision-studio::before {
+    inset: 0;
+    background: radial-gradient(ellipse at 0 42%, #62846538, transparent 55%),
+      radial-gradient(ellipse at 100% 80%, #b59a6420, transparent 48%),
+      linear-gradient(155deg, transparent 25%, #07191070 100%);
+  }
+  .decision-studio::after {
+    top: 260px; right: 0; bottom: 0; width: min(900px, 80%);
+    background: linear-gradient(180deg, #142e2430, #142e24b0), url('/images/decisionlab-botanical-hero.webp') right top / auto 1000px repeat-y;
+    opacity: .24; mask-image: linear-gradient(90deg, transparent, #000 70%);
+  }
+  .decision-studio .workspace-entrance { background: transparent; }
+  .decision-studio .workspace-entrance .workspace-botanical {
+    mask-image: linear-gradient(#000 35%, transparent);
+  }
+  .decision-studio .studio-workspace { padding-bottom: 72px; }
+  .queue-studio { background: #10271f; }
+  .queue-studio .backup-panel { position: relative; padding-top: 32px; border-color: #b59a6470; }
+  .queue-studio .queue-list { gap: 24px; }
+  .queue-studio :is(.queue-card, .product-empty) {
+    --foreground: #17221e; --muted: #505d55; --surface: #fbf9f3; --surface-soft: #f0ede3;
+    --border: #d4d4c6; --blue: #123c32; --blue-hover: #204e41; --focus: #376953;
+    --danger: #a23846; --disabled-text: #566058; --disabled-surface: #e5e7de;
+    color-scheme: light; color: var(--foreground); background: #f7f4ed;
+    padding: clamp(20px, 3vw, 36px); border: 0; border-top: 2px solid #b59a64;
+    box-shadow: 0 24px 55px -28px #0008; border-radius: 2px;
+  }
+  .queue-studio .queue-card:last-child { border-bottom: 0; }
+  .queue-studio .product-toolbar .button-primary,
+  .queue-studio .backup-panel .button-primary {
+    color: #123c32; background: #eee7d7; border-color: #dccb9f;
+  }
+  .queue-studio .product-toolbar .button-primary:hover,
+  .queue-studio .backup-panel .button-primary:hover { background: #fbf9f3; }
+
   .workspace-entrance { --foreground: #f7f4ed; --muted: #d5dfd2; position: relative; isolation: isolate; overflow: clip; background: #123c32; color: #f7f4ed; }
   .workspace-entrance .workspace-botanical { position: absolute; z-index: -3; inset: 0; }
   .workspace-entrance .workspace-botanical img { object-fit: cover; object-position: 70% 48%; opacity: .48; }
@@ -34,7 +78,7 @@
     color-scheme: light; color: var(--foreground); background: #f7f4ed;
     position: relative; max-width: 920px; margin-top: -56px; padding: 24px clamp(20px, 3.5vw, 44px) 28px;
     border: 0; border-top: 2px solid var(--champagne); border-radius: 2px;
-    box-shadow: 0 20px 50px -40px #10291f70;
+    box-shadow: 0 28px 70px -24px #0009;
   }
   .analyze-studio .product-local-note { position: relative; margin: 0 auto 24px; max-width: 920px; }
   .analyze-studio .product-local-note + .product-form,
@@ -117,6 +161,8 @@
   .editorial-home[data-atmosphere-hidden="true"] .editorial-type-loop .editorial-type-track { animation-play-state: paused; }
   /* Utility entrances move once, for under five seconds; fields never drift. */
   .workspace-entrance .editorial-type-track { animation: studio-type-settle 4s ease-out both; }
+  .decision-studio::after { animation: studio-canopy-settle 4s ease-out both; }
+  @keyframes studio-canopy-settle { from { transform: translateY(-10px); opacity: .12; } }
   .analyze-studio { transition: background-color 260ms ease; }
   .analyze-studio .product-step-progress::-webkit-progress-value { transition: width 220ms ease; }
   .analyze-studio .product-stage { animation: studio-step-arrive 180ms ease-out; }
@@ -131,6 +177,8 @@
 }
 
 @media screen and (max-width: 760px) {
+  .decision-studio::after { animation: none; width: 100%; opacity: .13; background-size: auto 700px; }
+  .decision-studio .studio-workspace { padding-bottom: 44px; }
   .editorial-home .editorial-type { font-size: 72px; opacity: .055; }
   .editorial-home .editorial-type-loop[data-ambient] .editorial-type-track,
   .workspace-entrance .editorial-type-track { animation: none; transform: none; }
@@ -156,8 +204,11 @@
   .queue-studio .queue-edit > summary > span { display: block; margin: 4px 0 0; }
 }
 @media screen and (max-width: 520px) {
-  .analyze-studio .product-form { padding-inline: 0; border-top: 0; margin-top: -12px; box-shadow: none; background: transparent; }
-  .analyze-studio:not(:has(.analysis-result)) { --background: #f7f4ed; --foreground: #17221e; --muted: #505d55; --border: #d4d4c6; --blue: #123c32; --focus: #376953; --danger: #a23846; color-scheme: light; color: var(--foreground); }
+  .analyze-studio .product-form { padding-inline: 0; margin-top: -12px; }
+  /* Preserve the existing field widths, with a narrow paper margin and forest gutter. */
+  .analyze-studio .product-form::before { content: ""; position: absolute; z-index: -1; inset: -2px -8px 0; background: #f7f4ed; border-top: 2px solid #b59a64; border-radius: 2px; }
+  .analyze-studio .product-form { isolation: isolate; }
+  .queue-studio :is(.queue-card, .product-empty) { padding-inline: 16px; }
   .queue-studio .product-toolbar > .product-field { flex-basis: 100%; margin-left: 0; }
   .queue-studio .queue-secondary-actions { gap: 4px; }
   .queue-studio .queue-secondary-actions .button-quiet { padding-inline: 8px; }
@@ -166,6 +217,8 @@
   .editorial-type-track { animation: none !important; transform: none !important; }
 }
 @media (forced-colors: active) {
+  .decision-studio::before, .decision-studio::after, .analyze-studio .product-form::before { display: none; }
+  .decision-studio, .queue-studio :is(.queue-card, .product-empty) { background: Canvas; color: CanvasText; }
   .editorial-type, .workspace-botanical, .workspace-entrance > .botanical-shade { display: none; }
   .decision-studio .workspace-entrance, .analyze-studio .product-form, .analyze-studio:has(.analysis-result) { background: Canvas; color: CanvasText; }
   .workspace-entrance .page-heading :is(h1, p, a, span), .queue-studio .decision-status { color: CanvasText; }

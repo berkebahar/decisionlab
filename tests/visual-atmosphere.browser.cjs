@@ -126,6 +126,9 @@ function send(method, params = {}, sessionId) {
     await cdp('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 760 });
     await navigate('/analyze?demo=0');
     await evaluate(`document.documentElement.dataset.theme = '${theme}'`);
+    assert.equal(await evaluate(`getComputedStyle(document.querySelector('.analyze-studio')).backgroundColor`), 'rgb(20, 46, 36)', 'forest extends behind the form in either theme');
+    assert.equal(await evaluate(`getComputedStyle(document.querySelector('.product-form')).backgroundColor`), 'rgb(247, 244, 237)', 'form stays opaque ivory, including mobile');
+    assert.equal(await evaluate(`getComputedStyle(document.querySelector('.decision-studio'), '::after').pointerEvents`), 'none', 'botanical layers never intercept controls');
     assert.ok(await evaluate(`document.querySelector('.workspace-entrance .editorial-type').inert`));
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('.workspace-entrance [aria-current="page"]')).color`), 'rgb(247, 244, 237)', 'breadcrumb contrast on forest');
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('.workspace-entrance .editorial-type-track')).animationIterationCount`), '1', 'utility atmosphere never loops');
@@ -151,6 +154,9 @@ function send(method, params = {}, sessionId) {
     assert.deepEqual(await evaluate(`[...document.querySelectorAll('.queue-card')].map(e => e.dataset.status)`), ['considering', 'postponed', 'bought', 'skipped']);
     assert.deepEqual(await evaluate(`[...document.querySelectorAll('.queue-card:first-child .queue-estimates dd')].map(e => e.textContent)`), ['$1,129.00', '$2.17']);
     assert.equal(await evaluate(`document.querySelector('.queue-card:last-child .queue-estimates > div:last-child dd').textContent`), 'Not available', 'zero uses never invents a per-use cost');
+    assert.equal(await evaluate(`getComputedStyle(document.querySelector('.queue-studio')).backgroundColor`), 'rgb(16, 39, 31)', 'Queue has a full forest surround');
+    assert.ok(await evaluate(`[...document.querySelectorAll('.queue-card')].every(e => getComputedStyle(e).backgroundColor === 'rgb(247, 244, 237)' && getComputedStyle(e).color === 'rgb(23, 34, 30)')`), 'all saved decisions remain readable ivory surfaces');
+    assert.ok(await evaluate(`document.querySelector('.queue-studio .backup-panel') !== null`), 'forest surround continues through backup');
     await layout(`${theme} ${width}px all Queue statuses`);
     await click('.queue-card .queue-receipt-actions button:first-child');
     assert.equal(await evaluate(`document.activeElement.textContent`), 'True Cost Receipt');
@@ -158,6 +164,8 @@ function send(method, params = {}, sessionId) {
     if ([1440, 390, 320].includes(width)) {
       await evaluate(`document.querySelector('.queue-card').scrollIntoView({block:'start', behavior:'instant'})`);
       await screenshot(`queue-${theme}-${width}`);
+      await evaluate(`window.scrollTo({top:0, behavior:'instant'})`);
+      await screenshot(`queue-entrance-${theme}-${width}`);
       await navigate('/analyze');
       await evaluate(`document.documentElement.dataset.theme = '${theme}'`);
       await wait(300);
