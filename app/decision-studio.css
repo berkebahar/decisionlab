@@ -6,10 +6,28 @@
 
 @media screen {
   /* The forest surround continues through the workspace, in either theme. */
-  .decision-studio {
+  .decision-studio,
+  body:has(> #main :is(.compare-studio, .purchases-studio, .insights-studio)) {
     --foreground: #f1f0e7; --muted: #bfccbe; --border: #637567;
     --surface: #203c30; --surface-soft: #294638; --blue: #d2dfc4; --focus: #ead7a9;
     --danger: #f0aeb3; --primary: #123c32; --primary-hover: #204e41;
+  }
+  /* Route-scoped canvas: present in server HTML, without changing the saved theme.
+     The header, footer, and space outside the inner workspace stay forest too. */
+  html:has(> body > #main :is(.compare-studio, .purchases-studio, .insights-studio)) { background: #142e24; }
+  body:has(> #main :is(.compare-studio, .purchases-studio, .insights-studio)) {
+    --background: #142e24; --glass-ivory: rgb(20 46 36 / .94);
+    --glass-surface: rgb(32 60 48 / .96); --glass-line: rgb(220 203 159 / .3);
+    --inner-highlight: rgb(247 244 237 / .08);
+    color-scheme: dark; background: var(--background);
+  }
+  body:has(> #main :is(.compare-studio, .purchases-studio, .insights-studio)) > :is(#main, .site-header, .site-footer) {
+    background: #142e24; border-color: #b59a6470;
+  }
+  body:has(> #main :is(.compare-studio, .purchases-studio, .insights-studio)) > :is(.site-header, .site-footer) .brand-symbol {
+    --mark-ink: #142e24; --mark-accent: #dccb9f;
+  }
+  .decision-studio {
     position: relative; isolation: isolate; overflow: clip; min-height: 85vh;
     color-scheme: dark; color: var(--foreground); background: #142e24;
   }
@@ -227,6 +245,9 @@
   .editorial-type-track { animation: none !important; transform: none !important; }
 }
 @media (forced-colors: active) {
+  html:has(> body > #main :is(.compare-studio, .purchases-studio, .insights-studio)),
+  body:has(> #main :is(.compare-studio, .purchases-studio, .insights-studio)),
+  body:has(> #main :is(.compare-studio, .purchases-studio, .insights-studio)) > :is(#main, .site-header, .site-footer) { background: Canvas; color: CanvasText; }
   .decision-studio::before, .decision-studio::after, .analyze-studio .product-form::before { display: none; }
   .decision-studio, .queue-studio :is(.queue-card, .product-empty),
   .decision-studio .studio-paper,

@@ -180,12 +180,19 @@ function send(method, params = {}, sessionId) {
       await navigate(path);
       await evaluate(`document.documentElement.dataset.theme = '${theme}'`);
       assert.equal(await evaluate(`getComputedStyle(document.querySelector('.decision-studio')).backgroundColor`), 'rgb(20, 46, 36)', `${path} shares the forest shell`);
+      assert.ok(await evaluate(`['html', 'body', '#main', '.site-header', '.site-footer'].every(selector => getComputedStyle(document.querySelector(selector)).backgroundColor === 'rgb(20, 46, 36)')`), `${path} outer canvas, navigation and footer stay forest in either theme`);
+      assert.equal(await evaluate(`getComputedStyle(document.querySelector('.site-header')).color`), 'rgb(241, 240, 231)', 'navigation keeps readable ivory text');
       assert.equal(await evaluate(`getComputedStyle(document.querySelector('${surface}')).backgroundColor`), 'rgb(247, 244, 237)', `${path} has opaque ivory content`);
       assert.ok(await evaluate(`document.querySelector('.editorial-type').inert && document.querySelector('.editorial-type').getAttribute('aria-hidden') === 'true'`));
       assert.equal(await evaluate(`getComputedStyle(document.querySelector('.editorial-type-track')).animationIterationCount`), '1');
       if (width <= 760) assert.equal(await evaluate(`getComputedStyle(document.querySelector('.decision-studio'), '::after').animationName`), 'none');
       await layout(`${theme} ${width}px ${path}`);
       if ([1440, 390, 320].includes(width)) { await wait(300); await screenshot(`${path.split('?')[0].slice(1)}-${theme}-${width}`); }
+      if (width === 1440) {
+        await evaluate(`document.querySelector('.site-footer').scrollIntoView({block:'end', behavior:'instant'})`);
+        await screenshot(`${path.split('?')[0].slice(1)}-${theme}-footer`);
+        await evaluate(`window.scrollTo({top:0, behavior:'instant'})`);
+      }
       if (path === '/purchases') await click('.purchase-card > details > summary');
       if (path === '/insights') await click('.legacy-insights > summary');
       if (path.startsWith('/compare')) await click('.comparison-product .comparison-details > summary');
@@ -201,6 +208,9 @@ function send(method, params = {}, sessionId) {
   }
   console.log('PASS Compare, Purchases and Insights: shared surfaces, decorative accessibility, expanded content, both themes and six widths');
   await navigate('/about');
+  await evaluate(`document.documentElement.dataset.theme = 'light'`);
+  await wait(300);
+  assert.equal(await evaluate(`getComputedStyle(document.body).backgroundColor`), 'rgb(247, 244, 237)', 'the forest canvas does not leak into About');
   assert.equal(await evaluate(`document.querySelector('.creator-signature a').getAttribute('href')`), '#creator');
   assert.equal(await evaluate(`getComputedStyle(document.documentElement).scrollBehavior`), 'smooth');
   await click('.creator-signature a');
