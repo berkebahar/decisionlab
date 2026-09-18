@@ -174,8 +174,42 @@ function send(method, params = {}, sessionId) {
   }
   console.log('PASS both themes at all six widths: contrast, steps, stable fields, receipt focus, Queue estimates/statuses');
 
+  for (const theme of ['light', 'dark']) for (const width of [1440, 1200, 1024, 768, 390, 320]) {
+    await cdp('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 760 });
+    for (const [path, surface] of [['/compare?demo=0', '.studio-paper'], ['/purchases', '.purchase-card'], ['/insights', '.studio-paper']]) {
+      await navigate(path);
+      await evaluate(`document.documentElement.dataset.theme = '${theme}'`);
+      assert.equal(await evaluate(`getComputedStyle(document.querySelector('.decision-studio')).backgroundColor`), 'rgb(20, 46, 36)', `${path} shares the forest shell`);
+      assert.equal(await evaluate(`getComputedStyle(document.querySelector('${surface}')).backgroundColor`), 'rgb(247, 244, 237)', `${path} has opaque ivory content`);
+      assert.ok(await evaluate(`document.querySelector('.editorial-type').inert && document.querySelector('.editorial-type').getAttribute('aria-hidden') === 'true'`));
+      assert.equal(await evaluate(`getComputedStyle(document.querySelector('.editorial-type-track')).animationIterationCount`), '1');
+      if (width <= 760) assert.equal(await evaluate(`getComputedStyle(document.querySelector('.decision-studio'), '::after').animationName`), 'none');
+      await layout(`${theme} ${width}px ${path}`);
+      if ([1440, 390, 320].includes(width)) { await wait(300); await screenshot(`${path.split('?')[0].slice(1)}-${theme}-${width}`); }
+      if (path === '/purchases') await click('.purchase-card > details > summary');
+      if (path === '/insights') await click('.legacy-insights > summary');
+      if (path.startsWith('/compare')) await click('.comparison-product .comparison-details > summary');
+      await layout(`${theme} ${width}px ${path} expanded`);
+      if (path.startsWith('/compare')) {
+        await click('.comparison-product .product-actions button:first-child');
+        await until(`document.querySelector('.product-form') !== null`);
+        await layout(`${theme} ${width}px comparison editor`);
+        await click('.product-steps button:nth-child(4)');
+        await layout(`${theme} ${width}px comparison financial context`);
+      }
+    }
+  }
+  console.log('PASS Compare, Purchases and Insights: shared surfaces, decorative accessibility, expanded content, both themes and six widths');
+  await navigate('/about');
+  assert.equal(await evaluate(`document.querySelector('.creator-signature a').getAttribute('href')`), '#creator');
+  assert.equal(await evaluate(`getComputedStyle(document.documentElement).scrollBehavior`), 'smooth');
+  await click('.creator-signature a');
+  await until(`location.hash === '#creator' && Math.abs(document.querySelector('#creator').getBoundingClientRect().top - 100) < 3`);
+  assert.equal(await evaluate(`location.pathname`), '/about');
+  console.log('PASS About story anchor scrolls to the creator section without navigating away');
+
   await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
-  for (const path of ['/', '/analyze', '/queue']) {
+  for (const path of ['/', '/analyze', '/compare', '/queue', '/purchases', '/insights']) {
     await navigate(path);
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('.editorial-type-track')).animationName`), 'none');
     assert.equal(await evaluate(`document.querySelector('.editorial-type').getAttribute('aria-hidden')`), 'true');

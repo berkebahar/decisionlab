@@ -34,8 +34,10 @@
   .decision-studio .studio-workspace { padding-bottom: 72px; }
   .queue-studio { background: #10271f; }
   .queue-studio .backup-panel { position: relative; padding-top: 32px; border-color: #b59a6470; }
-  .queue-studio .queue-list { gap: 24px; }
-  .queue-studio :is(.queue-card, .product-empty) {
+  .queue-studio .queue-list, .purchases-studio .purchase-list { gap: 24px; }
+  .queue-studio :is(.queue-card, .product-empty),
+  .decision-studio .studio-paper,
+  .purchases-studio :is(.purchase-card, .product-empty) {
     --foreground: #17221e; --muted: #505d55; --surface: #fbf9f3; --surface-soft: #f0ede3;
     --border: #d4d4c6; --blue: #123c32; --blue-hover: #204e41; --focus: #376953;
     --danger: #a23846; --disabled-text: #566058; --disabled-surface: #e5e7de;
@@ -43,7 +45,13 @@
     padding: clamp(20px, 3vw, 36px); border: 0; border-top: 2px solid #b59a64;
     box-shadow: 0 24px 55px -28px #0008; border-radius: 2px;
   }
-  .queue-studio .queue-card:last-child { border-bottom: 0; }
+  .queue-studio .queue-card:last-child, .purchases-studio .purchase-card:last-child { border-bottom: 0; }
+  .purchases-studio .studio-workspace { max-width: 1100px; }
+  .decision-studio .studio-paper, .purchases-studio :is(.purchase-card, .product-empty) {
+    --background: #f7f4ed; --success: #286045; --success-soft: #e4eee5;
+    --warning: #805414; --danger-soft: #faeaeb; --warm: #735a2f; --warm-soft: #f0e9db;
+    --cyan: #336556; --cyan-soft: #e6ece5;
+  }
   .queue-studio .product-toolbar .button-primary,
   .queue-studio .backup-panel .button-primary {
     color: #123c32; background: #eee7d7; border-color: #dccb9f;
@@ -208,7 +216,9 @@
   /* Preserve the existing field widths, with a narrow paper margin and forest gutter. */
   .analyze-studio .product-form::before { content: ""; position: absolute; z-index: -1; inset: -2px -8px 0; background: #f7f4ed; border-top: 2px solid #b59a64; border-radius: 2px; }
   .analyze-studio .product-form { isolation: isolate; }
-  .queue-studio :is(.queue-card, .product-empty) { padding-inline: 16px; }
+  .queue-studio :is(.queue-card, .product-empty),
+  .decision-studio .studio-paper,
+  .purchases-studio :is(.purchase-card, .product-empty) { padding-inline: 16px; }
   .queue-studio .product-toolbar > .product-field { flex-basis: 100%; margin-left: 0; }
   .queue-studio .queue-secondary-actions { gap: 4px; }
   .queue-studio .queue-secondary-actions .button-quiet { padding-inline: 8px; }
@@ -218,7 +228,9 @@
 }
 @media (forced-colors: active) {
   .decision-studio::before, .decision-studio::after, .analyze-studio .product-form::before { display: none; }
-  .decision-studio, .queue-studio :is(.queue-card, .product-empty) { background: Canvas; color: CanvasText; }
+  .decision-studio, .queue-studio :is(.queue-card, .product-empty),
+  .decision-studio .studio-paper,
+  .purchases-studio :is(.purchase-card, .product-empty) { background: Canvas; color: CanvasText; }
   .editorial-type, .workspace-botanical, .workspace-entrance > .botanical-shade { display: none; }
   .decision-studio .workspace-entrance, .analyze-studio .product-form, .analyze-studio:has(.analysis-result) { background: Canvas; color: CanvasText; }
   .workspace-entrance .page-heading :is(h1, p, a, span), .queue-studio .decision-status { color: CanvasText; }
