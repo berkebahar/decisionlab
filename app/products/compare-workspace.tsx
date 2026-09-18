@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useProducts } from "./use-products";
@@ -10,6 +10,7 @@ import ProductForm from "./product-form";
 import { saveProduct } from "./product-storage";
 import { notifyStorageChange } from "../use-local-storage";
 import Skeleton from "../components/skeleton";
+import { trackProductEvent } from "../analytics";
 import { comparisonMetrics, getComparisonFocus, type ComparisonMetric } from "./comparison-focus";
 import "./comparison-focus.css";
 
@@ -20,10 +21,29 @@ function Comparison({ initial, records }: { initial: Choice[]; records: ProductR
   const [primaryMetric, setPrimaryMetric] = useState<ComparisonMetric>("trueCost");
   const [focusAnnouncement, setFocusAnnouncement] = useState("");
   const comparison = choices.length ? compareProducts(choices.map(c => c.analysis)) : null;
+  const started = useRef(false);
+  const completedChoices = useRef<Choice[] | null>(null);
+  function startComparison() {
+    if (started.current) return;
+    started.current = true;
+    trackProductEvent("compare_started");
+  }
+  const validComparison = choices.length >= 2 && comparison?.sameCurrency;
+  useEffect(() => {
+    // Linked saved products and explicitly selected demos also begin a comparison.
+    if (choices.length > 0 && !started.current) {
+      started.current = true;
+      trackProductEvent("compare_started");
+    }
+    // Run after results commit, once per changed set of options; never on view toggles.
+    if (editing !== null || !validComparison || completedChoices.current === choices) return;
+    completedChoices.current = choices;
+    trackProductEvent("comparison_completed");
+  }, [choices, editing, validComparison]);
   function add(analysis: ProductAnalysis, demo = false, sourceId?: string) { if (choices.length >= 3) return; setChoices(current => [...current, { key: crypto.randomUUID(), analysis, demo, sourceId }]); setMessage(""); }
   if (editing !== null) return <ProductForm key={editing} initial={editing === "new" ? undefined : choices[editing].analysis} onCancel={() => setEditing(null)} onComplete={analysis => { if (editing === "new") add(analysis); else setChoices(current => current.map((choice, index) => index === editing ? { ...choice, analysis, sourceId: undefined } : choice)); setEditing(null); }} />;
   return <div className="comparison-workspace">
-    <div className="product-toolbar"><button className="button-primary" type="button" disabled={choices.length >= 3} onClick={() => setEditing("new")}>Add a product</button><div className="product-field"><label htmlFor="compare-load">Or choose a saved product</label><select id="compare-load" value="" disabled={choices.length >= 3} onChange={event => { const record = records.find(r => r.id === event.target.value); if (record) add(record.analysis, false, record.id); }}><option value="">Select a saved product</option>{records.map(record => <option key={record.id} value={record.id}>{record.analysis.name} · {record.analysis.condition}</option>)}</select></div></div>
+    <div className="product-toolbar"><button className="button-primary" type="button" disabled={choices.length >= 3} onClick={() => { startComparison(); setEditing("new"); }}>Add a product</button><div className="product-field"><label htmlFor="compare-load">Or choose a saved product</label><select id="compare-load" value="" disabled={choices.length >= 3} onChange={event => { const record = records.find(r => r.id === event.target.value); if (record) add(record.analysis, false, record.id); }}><option value="">Select a saved product</option>{records.map(record => <option key={record.id} value={record.id}>{record.analysis.name} · {record.analysis.condition}</option>)}</select></div></div>
 
     {choices.length > 0 && <>
     <div className="comparison-focus-picker"><div className="product-field"><label htmlFor="compare-primary-metric">Compare by</label><select id="compare-primary-metric" aria-describedby="compare-focus-help" value={primaryMetric} onChange={event => { const metric = event.target.value as ComparisonMetric; setPrimaryMetric(metric); setFocusAnnouncement(`Now highlighting ${comparisonMetrics[metric].toLowerCase()} for each product. The supporting breakdown is unchanged.`); }}>{Object.entries(comparisonMetrics).map(([value,label]) => <option key={value} value={value}>{label}</option>)}</select></div><p id="compare-focus-help">One measure, side by side. No scores or automatic winner.</p></div><p className="sr-only" role="status" aria-atomic="true">{focusAnnouncement}</p>
@@ -46,8 +66,8 @@ function Comparison({ initial, records }: { initial: Choice[]; records: ProductR
         {factors.includes("Goal") && <div><dt>Upfront goal delay</dt><dd>{!r.goal ? "Not included" : r.goal.delay === null ? "Unreachable with current contribution" : `+${formatQuantity(r.goal.delay)} ${r.goal.unit}s`}</dd></div>}
         {factors.includes("Purpose") && <><div><dt>Expected usefulness / importance</dt><dd>{a.usefulness}/5 · {a.importance}/5 (your assessments)</dd></div><div><dt>Problem to solve</dt><dd>{a.purpose || "Not entered"}</dd></div></>}
         <div><dt>Unknown or excluded</dt><dd>{r.missing.length ? r.missing.join(", ") : "None · all figures remain estimates"}</dd></div>
-      </dl></details><div className="product-actions"><button className="button-outline" onClick={() => setEditing(index)} type="button">Edit assumptions</button><button className="button-outline" disabled={choices.length >= 3} type="button" onClick={() => add({ ...a, name: `${a.name.slice(0,72)} copy` }, choice.demo)}>Duplicate</button><button className="button-quiet" type="button" onClick={() => setChoices(c => c.filter((_, i) => i !== index))}>Remove from view</button></div>
-      {!choice.demo && <button className="text-link" type="button" onClick={() => { try { const now = new Date().toISOString(); saveProduct(window.localStorage, { id: crypto.randomUUID(), analysis: a, status: "considering", reason: "", createdAt: now, updatedAt: now }); notifyStorageChange(); setMessage("An independent copy was saved to your queue."); } catch { setMessage("Could not save. Your existing product data was kept."); } }}>Save an independent receipt copy →</button>}
+      </dl></details><div className="product-actions"><button className="button-outline" onClick={() => { startComparison(); setEditing(index); }} type="button">Edit assumptions</button><button className="button-outline" disabled={choices.length >= 3} type="button" onClick={() => add({ ...a, name: `${a.name.slice(0,72)} copy` }, choice.demo)}>Duplicate</button><button className="button-quiet" type="button" onClick={() => setChoices(c => c.filter((_, i) => i !== index))}>Remove from view</button></div>
+      {!choice.demo && <button className="text-link" type="button" onClick={() => { try { const now = new Date().toISOString(); saveProduct(window.localStorage, { id: crypto.randomUUID(), analysis: a, status: "considering", reason: "", createdAt: now, updatedAt: now }); notifyStorageChange(); setMessage("An independent copy was saved to your queue."); trackProductEvent("decision_saved"); } catch { setMessage("Could not save. Your existing product data was kept."); } }}>Save an independent receipt copy →</button>}
       {choice.demo && <button className="text-link" type="button" onClick={() => setChoices(current => current.map((c,i) => i === index ? { ...c, demo: false } : c))}>Use example as my own starting point →</button>}
       </article>;
     })}</div>

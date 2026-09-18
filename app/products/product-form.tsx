@@ -25,7 +25,13 @@ const stepHelp = [
   "Add a little context, or continue with the neutral ratings below.",
   "Both options are optional. You can go straight to your receipt.",
 ];
-export default function ProductForm({ initial, onComplete, onCancel }: { initial?: ProductAnalysis; onComplete: (analysis: ProductAnalysis) => void; onCancel?: () => void }) {
+export default function ProductForm({ initial, onComplete, onCancel, onStart }: { initial?: ProductAnalysis; onComplete: (analysis: ProductAnalysis) => void; onCancel?: () => void; onStart?: () => void }) {
+  const started = useRef(false);
+  function start() {
+    if (started.current) return;
+    started.current = true;
+    onStart?.();
+  }
   const [fields, setFields] = useState(() => initialFields(initial));
   const [step, setStep] = useState(0), [error, setError] = useState("");
   const [furthest, setFurthest] = useState(initial ? 3 : 0);
@@ -66,11 +72,11 @@ export default function ProductForm({ initial, onComplete, onCancel }: { initial
     if (!isAnalysis(a)) { setError("Check all four steps: name, price, ownership duration, expected uses, and any selected alternative or goal. Use valid nonnegative amounts (up to 1 billion), with no more than two decimal places."); return; }
     try { onComplete(a); } catch (error) { setError(error instanceof Error ? error.message : "Could not analyze these inputs."); }
   }
-  return <form ref={form} className="product-form" onInvalidCapture={event => {
+  return <form ref={form} className="product-form" onChangeCapture={start} onInvalidCapture={event => {
     const input = event.target as HTMLInputElement;
     revealInvalidField(input);
     setError(`${input.labels?.[0]?.textContent ?? "This field"}: ${input.validationMessage}`);
-  }} onSubmit={event => { event.preventDefault(); if (step < 3) changeStep(step + 1); else submit(); }}>
+  }} onSubmit={event => { event.preventDefault(); start(); if (step < 3) changeStep(step + 1); else submit(); }}>
     <nav className="product-steps" aria-label="Analysis steps">{steps.map((name,index) => <button key={name} type="button" disabled={index > furthest + 1} aria-current={step === index ? "step" : undefined} onClick={() => changeStep(index)}><span>{index + 1}</span>{name}</button>)}<span className="product-step-receipt"><span>5</span>Receipt</span></nav><progress className="product-step-progress" value={step + 1} max={5} aria-label={`Step ${step + 1} of 5: ${steps[step]}`} />
     <section className="product-stage" key={step} aria-labelledby={`${prefix}-stage-heading`}>
     <div className="product-form-heading"><p className="eyebrow">Step {step + 1} of 5</p><h2 ref={heading} id={`${prefix}-stage-heading`} tabIndex={-1}>{steps[step]}</h2><p>{stepHelp[step]}</p>{step < 2 && <p className="product-helper">Amounts in {fields.currency}. Leave unknown costs blank; enter 0 only for a confirmed zero.</p>}</div>

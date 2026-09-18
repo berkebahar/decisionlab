@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useId, useRef } from "react";
+import { trackProductEvent } from "../analytics";
 import { printReceipt } from "./print-receipt";
 import ProductScore from "./product-score-view";
 import ReceiptLine from "./receipt-line";
@@ -33,6 +34,7 @@ export default function TrueCostReceipt({ analysis: a, demo = false, compact = f
   function print() {
     const element = receipt.current; if (!element) return;
     printCleanup.current?.();
+    trackProductEvent("receipt_printed");
     printCleanup.current = printReceipt(element);
   }
   return <article ref={receipt} className={`true-receipt ${compact ? "receipt-compact" : ""}`} aria-labelledby={heading}>

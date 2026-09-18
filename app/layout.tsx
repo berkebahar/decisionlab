@@ -11,6 +11,7 @@ import "./interaction-polish.css";
 import PointerLight from "./components/pointer-light";
 import SiteNavigation from "./components/site-navigation";
 import SiteFooter from "./components/site-footer";
+import PrivacyAnalytics from "./components/privacy-analytics";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
   title: { default: "DecisionLab — Before you buy", template: "%s | DecisionLab" },
   description: "Before you buy it, see what it will really cost. Compare product ownership, usage, resale value, and the goals a purchase may delay.",
   authors: [{ name: "Berke Bahar" }],
+  referrer: "no-referrer",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -37,6 +39,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head><script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('decisionlab.theme.v1');document.documentElement.dataset.theme=t==='dark'||t==='light'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){document.documentElement.dataset.theme='light'}})();` }} /></head>
       <body className="min-h-full flex flex-col" id="top">
+        <PrivacyAnalytics />
         <a className="skip-link" href="#main">Skip to content</a>
         <SiteNavigation />
         <main id="main" tabIndex={-1}>{children}</main>
