@@ -35,7 +35,7 @@ Refs guard route/start/completion events across re-renders and React Strict Mode
 
 ## Vercel setup and dashboard
 
-1. Open the DecisionLab project in Vercel, select **Analytics** in the sidebar, and click **Enable** for Web Analytics if it is not already enabled. No analytics keys or new environment variables are needed for a Vercel deployment.
+1. Open the DecisionLab project in Vercel, select **Analytics** in the sidebar, and click **Enable** for Web Analytics if it is not already enabled. Event collection needs no analytics keys or new environment variables for a Vercel deployment. The About page's public aggregate totals require separate server-side read credentials; see [public usage statistics setup](PUBLIC_USAGE_STATS.md).
 2. Deploy this change yourself when ready. Enabling Analytics provisions Vercel's collection endpoints on the next deployment; application routes remain unchanged. Nothing in this implementation pushes or deploys automatically.
 3. In **Analytics**, select **Production** and the desired date range. The overview shows visitors and page views; the Pages/Routes panels show usage by page. Use normal page views for traffic totals, rather than adding custom event counts to them.
 4. In the same dashboard, open the **Custom Events** panel and select an event name to see/filter its activity. There are no property breakdowns because no custom properties are sent. Vercel currently requires **Pro or Enterprise** for custom events; a Hobby project needs an eligible plan to use this part of the dashboard. No event names need to be registered manually.

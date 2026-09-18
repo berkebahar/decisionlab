@@ -166,6 +166,8 @@ Page metadata and static content stay in Server Components. The preview, calcula
 
 ## Run locally
 
+The About page's **DecisionLab in use** section reads real aggregate totals from Vercel's server-side Analytics API. Configure the private read credentials described in [public usage statistics setup](docs/PUBLIC_USAGE_STATS.md) to display counts. Without them, the section shows an unavailable message; no numbers are invented.
+
 Use Node.js 24 for the TypeScript calculation tests.
 
 ```bash
