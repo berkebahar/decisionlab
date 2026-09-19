@@ -5,7 +5,7 @@ import InsightsWorkspace from "./insights-workspace";
 
 export const metadata: Metadata = {
   title: "Insights",
-  description: "Separate hypothetical product analyses from recorded purchases and reviews. Evidence from your own records, kept in this browser.",
+  description: "Separate hypothetical product analyses from recorded purchases and reviews. Evidence from your own saved records.",
 };
 
 export default function InsightsPage() {

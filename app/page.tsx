@@ -47,7 +47,7 @@ export default function Home() {
           <h1 id="hero-heading">Before you buy it,<br />see what it will really cost.</h1>
           <p className="hero-description">See the price, the upkeep, and what each use could cost.</p>
           <div className="hero-actions"><Link href="/analyze" className="button-primary">Analyze a product <Icon name="arrow" /></Link><Link href="/compare" className="editorial-text-link">Compare products <span aria-hidden="true">↗</span></Link></div>
-          <p className="editorial-privacy">No account. No bank details. Private to this browser.</p>
+          <p className="editorial-privacy">No account required. No bank details. Optional cloud saving.</p>
         </div>
         <HiddenCostStory />
         <a className="editorial-scroll-cue" href="#cost-story">See the whole picture <span aria-hidden="true">↓</span></a>

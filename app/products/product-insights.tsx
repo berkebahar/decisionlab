@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import StorageStatus from "./storage-status";
 import { useProducts } from "./use-products";
 import { productInsights, analyzeProduct } from "./product-calculations";
 import { formatMoney, formatQuantity, currencies } from "./product-model";
@@ -8,9 +9,9 @@ import Skeleton from "../components/skeleton";
 export default function ProductInsights() {
   const { records, loading, error } = useProducts();
   if (loading) return <Skeleton label="Preparing your insights" />;
-  if (error) return <p role="status" className="product-error">{error}</p>;
+  if (error) return <><StorageStatus /><p role="status" className="product-error">{error}</p></>;
   const summary = productInsights(records), reviews = records.filter(r => r.status === "bought" && r.review);
-  return <section className="product-insights" aria-labelledby="product-insights-heading"><h2 id="product-insights-heading">Learn from what you actually use.</h2>{!records.length ? <div className="product-empty"><h3>Start with one purchase in mind.</h3><p>Save a True Cost Receipt first. When you buy and review a product, your experience will appear here.</p><Link className="button-primary" href="/analyze">Analyze a product</Link></div> : <>
+  return <section className="product-insights" aria-labelledby="product-insights-heading"><StorageStatus /><h2 id="product-insights-heading">Learn from what you actually use.</h2>{!records.length ? <div className="product-empty"><h3>Start with one purchase in mind.</h3><p>Save a True Cost Receipt first. When you buy and review a product, your experience will appear here.</p><Link className="button-primary" href="/analyze">Analyze a product</Link></div> : <>
     <p className="insight-intro">{summary.reviewed === 0 ? "Your estimates are a starting point. Add a purchase review to see how they compare with experience." : summary.reviewed === 1 ? "One review is a useful observation, not a pattern. Start with the experience below." : `${summary.reviewed} purchase reviews to learn from. These describe your experience, not product quality for everyone.`}</p>
     <div className="product-summary-grid"><article><span>Products considered</span><strong>{records.length}</strong><p>{summary.counts.considering + summary.counts.postponed} considering or postponed · {summary.counts.skipped} skipped</p></article><article><span>Marked bought</span><strong>{summary.counts.bought}</strong><p>Choices you recorded, not verified transactions</p></article><article><span>Purchase reviews</span><strong>{summary.reviewed}</strong><p>{summary.again} would buy again · {summary.notAgain} would not</p></article></div>
     <p className="product-local-note">Estimates and recorded costs stay separate. Analyzing or skipping a product is not proof of money saved.</p>

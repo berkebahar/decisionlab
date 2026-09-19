@@ -228,3 +228,7 @@
   .receipt-print-target button, .receipt-print-target .receipt-print { display: none !important; }
 }
 @media (prefers-reduced-motion: reduce) { .product-steps button { transition: none; } }
+
+/* Account details reuse the workspace form and color tokens. */
+.account-email { overflow-wrap: anywhere; }
+.product-local-note > .text-link + .text-link { margin-left: 18px; }

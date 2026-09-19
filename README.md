@@ -136,13 +136,13 @@ Impact labels are descriptive thresholds, not scientifically validated scores or
 
 ## Storage
 
-Saved decisions use the versioned key `decisionlab.saved-decisions.v1` in localStorage. They belong to this browser and site; there is no account, server database, or cross-device sync. Clearing site data removes them. A save or delete is only reported as successful after the browser accepts the write. Unreadable saved data is preserved, and blocked or full storage produces a friendly message. Calculator reset does not clear saved decisions.
+Saved decisions use the versioned key `decisionlab.saved-decisions.v1` in localStorage. These legacy GoalLens records remain local to this browser; optional cloud accounts apply only to product Queue/Purchases. Clearing site data removes them. A save or delete is only reported as successful after the browser accepts the write. Unreadable saved data is preserved, and blocked or full storage produces a friendly message. Calculator reset does not clear saved decisions.
 
 Savings goals use the separate key `decisionlab.savings-goals.v1`, preserving the existing saved-decision format. Each goal has a name, target amount, current amount, weekly contribution, optional target date, ID, and creation timestamp. Goal amounts use integer cents for projections. Targets must be positive; overfunded goals are valid, with progress capped at 100%. A zero weekly contribution pauses the estimate; a fully funded goal is complete. Forecasts add whole weeks to today's local calendar date and handle dates beyond the supported calendar range without crashing.
 
 The dashboard's SVG timelines show projected savings from today to completion. Contributions are plans, not automatic balance updates: edit the current amount as you save. Totals sum separate allocations: each dollar should be assigned to one goal only, not repeated across goals. Links such as `/goallens?goal=<id>` load the goal from this browser; editing calculator inputs does not modify the saved goal. A paused goal opens with its actual zero contribution and asks for a positive savings rate before calculating.
 
-Simulator scenarios use the additional versioned key `decisionlab.scenarios.v1`; the two original goal and decision keys remain unchanged. Theme preference uses `decisionlab.theme.v1`. All financial data remains in browser storage. The sample dashboard uses in-memory examples without writing them to any key.
+Simulator scenarios use the additional versioned key `decisionlab.scenarios.v1`; the two original goal and decision keys remain unchanged. Theme preference uses `decisionlab.theme.v1`. These supporting-tool records remain in browser storage. Product Queue/Purchases can optionally use cloud storage while signed in. The sample dashboard uses in-memory examples without writing them to any key.
 
 ### Decision journal and backups
 
@@ -152,7 +152,7 @@ Backup exports now use `decisionlab-backup` version 2, including products and al
 
 Imports validate the 1 MB file limit, format/version, up to 1,000 records per category, IDs, numeric ranges/precision, dates, strings, enums and nested records. Preview shows additions; explicit confirmation merges **missing IDs only**, preserving existing matches and their reviews. No replace-all operation is offered. Changed previews are rejected. Write failures attempt rollback; failure of rollback is explicitly reported. localStorage is not a transaction system, so close other editing tabs while importing.
 
-Data is local to this browser/device and may disappear if browser data is cleared. Export files contain personal entries; keep them private. URLs carry only opaque record IDs, mode names or fictional demo indices, never financial values. Vercel Web Analytics measures page views and anonymous product actions with fixed event names and no custom properties; financial and personal entries are never sent. Analytics URLs exclude query parameters and fragments. See [analytics setup, event definitions, and local checks](docs/ANALYTICS.md). No bank connections, accounts, advertisements, affiliates, scraping, payments, or external financial requests are present. Deletion targets only DecisionLab records, never `localStorage.clear()`.
+Signed-out product records and supporting-tool data are local to this browser/device and may disappear if browser data is cleared. Signed-in Queue/Purchases save to the account; local records stay separate. Export files contain personal entries; keep them private. URLs carry only opaque record IDs, mode names or fictional demo indices, never financial values. Vercel Web Analytics measures page views and anonymous product actions with fixed event names and no custom properties; financial and personal entries are never sent. Analytics URLs exclude query parameters and fragments. See [analytics setup, event definitions, and local checks](docs/ANALYTICS.md). No bank connections, advertisements, affiliates, scraping, payments, or external financial-data feeds are present. Optional Supabase accounts store only the Queue/Purchases data users explicitly save while signed in. Deletion targets only DecisionLab records, never `localStorage.clear()`.
 
 ## Technology
 
@@ -163,6 +163,10 @@ Data is local to this browser/device and may disappear if browser data is cleare
 - Node.js built-in test runner (no additional testing package)
 
 Page metadata and static content stay in Server Components. The preview, calculator, navigation menu, dashboard, and saved decisions use Client Components. Browser storage is read through hydration-safe external-store subscriptions. Pure calculation and storage modules keep the behavior testable. No chart or additional UI packages are required.
+
+## Optional cloud accounts
+
+See [Supabase setup, schema, security policies, and manual checks](docs/SUPABASE_SETUP.md). Run the supplied SQL migration and set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to enable email/password accounts and cloud Queue/Purchases. Without those variables the existing local-only app still works. No records are migrated automatically.
 
 ## Run locally
 

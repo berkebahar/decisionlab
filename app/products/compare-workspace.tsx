@@ -7,8 +7,7 @@ import { compareProducts } from "./product-calculations";
 import { formatMoney, formatUnitCost, formatQuantity, type ProductAnalysis, type ProductRecord } from "./product-model";
 import { demoGroups } from "./demo-products";
 import ProductForm from "./product-form";
-import { saveProduct } from "./product-storage";
-import { notifyStorageChange } from "../use-local-storage";
+import StorageStatus from "./storage-status";
 import Skeleton from "../components/skeleton";
 import { trackProductEvent } from "../analytics";
 import { comparisonMetrics, getComparisonFocus, type ComparisonMetric } from "./comparison-focus";
@@ -16,6 +15,9 @@ import "./comparison-focus.css";
 
 type Choice = { key: string; analysis: ProductAnalysis; demo: boolean; sourceId?: string };
 function Comparison({ initial, records }: { initial: Choice[]; records: ProductRecord[] }) {
+  const products = useProducts();
+  const [busy, setBusy] = useState(false);
+  const copyIds = useRef(new Map<string, string>());
   const [choices, setChoices] = useState(initial), [editing, setEditing] = useState<number | "new" | null>(null);
   const [factors, setFactors] = useState(["Costs", "Usage", "Goal", "Purpose"]), [message, setMessage] = useState("");
   const [primaryMetric, setPrimaryMetric] = useState<ComparisonMetric>("trueCost");
@@ -67,7 +69,7 @@ function Comparison({ initial, records }: { initial: Choice[]; records: ProductR
         {factors.includes("Purpose") && <><div><dt>Expected usefulness / importance</dt><dd>{a.usefulness}/5 · {a.importance}/5 (your assessments)</dd></div><div><dt>Problem to solve</dt><dd>{a.purpose || "Not entered"}</dd></div></>}
         <div><dt>Unknown or excluded</dt><dd>{r.missing.length ? r.missing.join(", ") : "None · all figures remain estimates"}</dd></div>
       </dl></details><div className="product-actions"><button className="button-outline" onClick={() => { startComparison(); setEditing(index); }} type="button">Edit assumptions</button><button className="button-outline" disabled={choices.length >= 3} type="button" onClick={() => add({ ...a, name: `${a.name.slice(0,72)} copy` }, choice.demo)}>Duplicate</button><button className="button-quiet" type="button" onClick={() => setChoices(c => c.filter((_, i) => i !== index))}>Remove from view</button></div>
-      {!choice.demo && <button className="text-link" type="button" onClick={() => { try { const now = new Date().toISOString(); saveProduct(window.localStorage, { id: crypto.randomUUID(), analysis: a, status: "considering", reason: "", createdAt: now, updatedAt: now }); notifyStorageChange(); setMessage("An independent copy was saved to your queue."); trackProductEvent("decision_saved"); } catch { setMessage("Could not save. Your existing product data was kept."); } }}>Save an independent receipt copy →</button>}
+      {!choice.demo && <button className="text-link" type="button" disabled={busy || products.saving || !!products.error} onClick={async () => { if (busy) return; setBusy(true); try { const now = new Date().toISOString(); if (!copyIds.current.has(choice.key)) copyIds.current.set(choice.key, crypto.randomUUID()); await products.save({ id: copyIds.current.get(choice.key)!, analysis: a, status: "considering", reason: "", createdAt: now, updatedAt: now }); copyIds.current.delete(choice.key); setMessage("An independent copy was saved to your queue."); trackProductEvent("decision_saved"); } catch { setMessage("Could not save. Your existing product data was kept."); } finally { setBusy(false); } }}>Save an independent receipt copy →</button>}
       {choice.demo && <button className="text-link" type="button" onClick={() => setChoices(current => current.map((c,i) => i === index ? { ...c, demo: false } : c))}>Use example as my own starting point →</button>}
       </article>;
     })}</div>
@@ -83,5 +85,5 @@ export default function CompareWorkspace() {
   if (loading) return <Skeleton label="Preparing your comparison" />;
   const demo = params.get("demo") !== null ? demoGroups[Number(params.get("demo"))] : undefined;
   const initial = demo ? demo.products.map((analysis, index) => ({ key: `demo-${index}`, analysis, demo: true })) : ids.map(id => records.find(r => r.id === id)).filter((r): r is ProductRecord => !!r).map(r => ({ key:r.id, analysis:r.analysis, demo:false, sourceId:r.id }));
-  return <>{error && <p role="status" className="product-error">{error}</p>}{ids.length > initial.length && <p className="product-notice">Some linked products are not available in this browser.</p>}<Comparison key={`${ids.join(",")}:${params.get("demo") ?? ""}`} initial={initial} records={records} /></>;
+  return <><StorageStatus />{error && <p role="status" className="product-error">{error}</p>}{ids.length > initial.length && <p className="product-notice">Some linked products are not available in your current storage.</p>}<Comparison key={`${ids.join(",")}:${params.get("demo") ?? ""}`} initial={initial} records={records} /></>;
 }

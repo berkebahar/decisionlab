@@ -9,7 +9,7 @@ export default function DataBackup() {
   const [message, setMessage] = useState("");
   const request = useRef(0);
   return <section className="backup-panel container" aria-labelledby="backup-heading">
-    <div><p className="eyebrow">Your records, in your hands</p><h2 id="backup-heading">Keep a local backup.</h2><p>Records belong to this browser and device. Clearing browser data may erase them. Export a file to keep product analyses, queue decisions, purchase reviews, goals, comparisons, journals, and scenarios. Backup files contain your personal entries; keep them private.</p></div>
+    <div><p className="eyebrow">Your records, in your hands</p><h2 id="backup-heading">Keep a local backup.</h2><p>This backup covers local browser records only; it does not export or import cloud records. Clearing browser data may erase them. Export a file to keep product analyses, queue decisions, purchase reviews, goals, comparisons, journals, and scenarios. Importing adds records to this browser only, even while signed in. Backup files contain your personal entries; keep them private.</p></div>
     <div className="backup-controls">
       <button type="button" className="button-outline" onClick={() => {
         try {

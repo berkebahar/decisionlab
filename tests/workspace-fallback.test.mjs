@@ -47,7 +47,7 @@ test("workspace error offers retry and a regular reload link without exposing er
   assert.match(html, /This page could not open/);
   assert.match(html, />Try again<\/button>/);
   assert.match(html, /href="">Reload page<\/a>/);
-  assert.match(html, /Your saved records remain in this browser/);
+  assert.match(html, /Your saved records are preserved/);
 });
 
 test("receipt explains the floor in the selected currency, with a warning when resale exceeds cost", () => {
