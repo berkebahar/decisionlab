@@ -7,7 +7,7 @@ import Icon from "../components/lab-icon";
 import { getUsageStatistics } from "./usage-statistics-data";
 import UsageStatistics from "./usage-statistics";
 
-export const metadata: Metadata = { title: "About the Lab", description: "Meet DecisionLab and its creator, Berke Bahar. A pre-purchase decision platform that makes opportunity cost useful in everyday life." };
+export const metadata: Metadata = { title: "About the Lab", description: "Meet DecisionLab and its creator, Berke B. A pre-purchase decision platform that makes opportunity cost useful in everyday life." };
 
 // Cache the rendered page too, including the unavailable/partial states.
 export const revalidate = 600;

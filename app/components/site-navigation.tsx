@@ -59,7 +59,7 @@ export default function SiteNavigation() {
         <p className="eyebrow">Your decision workspace</p>
         <nav aria-label="Mobile navigation">{pages.map(([href, label], index) => <Link key={href} href={href} aria-current={pathname === href ? "page" : undefined} onClick={close}><span className="nav-index">0{index + 1}</span>{label}<Icon name="arrow" size={18} /></Link>)}</nav>
         <div className="support-links"><p className="eyebrow">Supporting tools</p><Link href="/dashboard" onClick={close}>Savings Goals</Link><Link href="/goallens" onClick={close}>GoalLens</Link><Link href="/simulator" onClick={close}>Savings Simulator</Link></div><div className="drawer-note"><Icon name="target" /><p>Small decisions.<br /><strong>More possibilities.</strong></p></div>
-        <p className="drawer-credit">Created, designed, and developed by Berke Bahar.</p>
+        <p className="drawer-credit">Created, designed, and developed by Berke B.</p>
       </div>
     </dialog>
   </header>;

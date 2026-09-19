@@ -104,7 +104,7 @@ export default function Home() {
         <details className="editorial-disclosure"><summary>Illustration assumptions</summary><p>This is a fictional demonstration, not a user record or a claim about laptop performance. The prediction uses the new-laptop example above. The imagined outcome is a {formatMoney(illustrativeReview.price ?? 0, example.currency)} purchase, {formatMoney(illustrativeReview.maintenance ?? 0, example.currency)} maintenance, {formatMoney(illustrativeReview.accessories ?? 0, example.currency)} accessories, {formatMoney(illustrativeReview.repairs ?? 0, example.currency)} repairs, and {formatMoney(illustrativeReview.resale ?? 0, example.currency)} resale after four years. Tax, shipping, and subscriptions are zero. Net cost is {formatMoney(experienced.cost, example.currency)} across {formatQuantity(illustrativeReview.uses ?? 0)} uses. Nothing is saved.</p></details>
       </figure>
       <div className="editorial-reflection-links"><Link href="/purchases" className="text-link">Your purchases <Icon name="arrow" size={17} /></Link><Link href="/insights" className="text-link">Insights from your records <Icon name="arrow" size={17} /></Link></div>
-      <div className="editorial-closing"><h2>Analyze your<br />next purchase.</h2><div><Link className="button-primary" href="/analyze">Analyze a product <Icon name="arrow" /></Link><p>Created by Berke Bahar.</p></div></div>
+      <div className="editorial-closing"><h2>Analyze your<br />next purchase.</h2><div><Link className="button-primary" href="/analyze">Analyze a product <Icon name="arrow" /></Link><p>Created by Berke B.</p></div></div>
 
     </section>
   </div>;

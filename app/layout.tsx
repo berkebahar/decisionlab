@@ -27,7 +27,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: { default: "DecisionLab — Before you buy", template: "%s | DecisionLab" },
   description: "Before you buy it, see what it will really cost. Compare product ownership, usage, resale value, and the goals a purchase may delay.",
-  authors: [{ name: "Berke Bahar" }],
+  authors: [{ name: "Berke B." }],
   referrer: "no-referrer",
 };
 

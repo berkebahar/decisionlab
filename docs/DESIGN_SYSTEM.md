@@ -22,7 +22,7 @@ Georgia/system serif defines major headings. Existing Geist remains the body/con
 
 ## Composition and data
 
-The homepage pairs “Before you buy it, see what it will really cost.” with an interactive fictional True Cost Receipt and the primary action “Analyze a product.” Receipt previews alternate framed instruments with flatter editorial sections. GoalLens, goals, and simulation remain supporting tools. Illustrative goals are identified as examples; the artificial Insights bar decoration has been removed. The creator section remains, with “Created by Berke Bahar.” in the footer.
+The homepage pairs “Before you buy it, see what it will really cost.” with an interactive fictional True Cost Receipt and the primary action “Analyze a product.” Receipt previews alternate framed instruments with flatter editorial sections. GoalLens, goals, and simulation remain supporting tools. Illustrative goals are identified as examples; the artificial Insights bar decoration has been removed. The creator section remains, with “Created by Berke B.” in the footer.
 
 The dashboard's precision dial uses real capped goal progress: fine ticks, a progress arc, readable percentage, and an accessible text equivalent. It appears only on goal cards. Planned contributions must represent separate allocations of money. Dates assume end-of-week deposits beginning in one week.
 

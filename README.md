@@ -1,6 +1,6 @@
 # DecisionLab
 
-Created by Berke Bahar.
+Created by Berke B.
 
 **Before you buy it, see what it will really cost.**
 
@@ -191,13 +191,13 @@ Tests cover all calculator modes, legacy saved decisions, goal persistence and e
 
 ## About the Creator
 
-DecisionLab was created by Berke Bahar, with an interest in computer science, mathematics, and economics.
+DecisionLab was created by Berke B., with an interest in computer science, mathematics, and economics.
 
-Created by Berke Bahar.
+Created by Berke B.
 
 ## AI assistance
 
-Created by Berke Bahar. Development has been assisted by OpenAI Codex for implementation, debugging, tests, and design iteration. This is not a claim that every line was written by hand. Berke remains the project creator; the assumptions, code, and educational explanations should be reviewed and understood before relying on the results.
+Created by Berke B. Development has been assisted by OpenAI Codex for implementation, debugging, tests, and design iteration. This is not a claim that every line was written by hand. Berke remains the project creator; the assumptions, code, and educational explanations should be reviewed and understood before relying on the results.
 
 ## Product transformation review
 
