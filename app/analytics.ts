@@ -4,6 +4,7 @@ const eventNames = [
   "homepage_viewed", "analyze_started", "analysis_completed", "compare_started",
   "comparison_completed", "decision_saved", "queue_opened", "purchase_recorded",
   "review_completed", "receipt_printed",
+  "research_prompt_seen", "research_before_completed", "research_skipped", "research_response_completed",
 ] as const;
 export type ProductEvent = typeof eventNames[number];
 

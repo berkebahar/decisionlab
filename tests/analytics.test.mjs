@@ -24,7 +24,7 @@ test("custom tracking accepts only approved event names and never forwards extra
   const calls = [];
   globalThis.window = { va: (...args) => calls.push(args) };
   try {
-    const names = ["homepage_viewed", "analyze_started", "analysis_completed", "compare_started", "comparison_completed", "decision_saved", "queue_opened", "purchase_recorded", "review_completed", "receipt_printed"];
+    const names = ["homepage_viewed", "analyze_started", "analysis_completed", "compare_started", "comparison_completed", "decision_saved", "queue_opened", "purchase_recorded", "review_completed", "receipt_printed", "research_prompt_seen", "research_before_completed", "research_skipped", "research_response_completed"];
     for (const name of names) trackProductEvent(name, { name: "Private product", price: 1234, notes: "Private notes" });
     trackProductEvent("Private user input");
     assert.deepEqual(calls, names.map(name => ["event", { name, options: undefined }]));

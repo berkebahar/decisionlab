@@ -1,3 +1,5 @@
+import type { ResearchResponse, ResearchRow } from "../../research/decision-research";
+
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 export type QueueRow = {
   id: string; user_id: string; created_at: string; updated_at: string;
@@ -10,6 +12,7 @@ export type PurchaseRow = {
 export type Database = {
   public: {
     Tables: {
+      decision_research_responses: { Row: ResearchRow; Insert: ResearchResponse; Update: never; Relationships: [] };
       queue_items: { Row: QueueRow; Insert: Pick<QueueRow, "user_id" | "analysis"> & Partial<QueueRow>; Update: Partial<QueueRow>; Relationships: [] };
       purchases: { Row: PurchaseRow; Insert: Pick<PurchaseRow, "user_id" | "queue_item_id" | "purchase_estimate"> & Partial<PurchaseRow>; Update: Partial<PurchaseRow>; Relationships: [{ foreignKeyName: "purchases_queue_item_id_user_id_fkey"; columns: ["queue_item_id", "user_id"]; isOneToOne: true; referencedRelation: "queue_items"; referencedColumns: ["id", "user_id"] }] };
     };

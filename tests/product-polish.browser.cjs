@@ -87,6 +87,8 @@ function send(method, params = {}, sessionId) {
   await click('.product-form button[type="submit"]');
   await until(`document.querySelector('.product-form-heading h2')?.textContent === 'Financial context'`);
   await click('.product-form button[type="submit"]');
+  await until(`document.querySelector('[data-decision-research]') !== null`);
+  await click('[data-decision-research] .button-quiet');
   await until(`document.querySelector('.analysis-result') !== null`);
   assert.equal(await evaluate(`document.activeElement.textContent`), 'True Cost Receipt', 'receipt receives focus after generation');
   assert.equal(await evaluate(`document.querySelector('.receipt-total .receipt-amount').textContent`), '$899.00');

@@ -81,6 +81,7 @@ function send(method, params = {}, sessionId) {
     grant usage on schema auth, public to anon, authenticated; grant execute on function auth.uid() to anon, authenticated;
     insert into auth.users values ('${userA.id}'), ('${userB.id}');`);
   await database.exec(require('node:fs').readFileSync(require('node:path').join(__dirname, '../supabase/migrations/202609200001_cloud_products.sql'), 'utf8'));
+  await database.exec(require('node:fs').readFileSync(require('node:path').join(__dirname, '../supabase/migrations/202609220001_decision_research_responses.sql'), 'utf8'));
   const tokens = new Map();
   function session(user) {
     const exp = Math.floor(Date.now() / 1000) + 3600;
@@ -89,6 +90,8 @@ function send(method, params = {}, sessionId) {
     return { access_token: token, refresh_token: `refresh-${user.id}`, expires_in: 3600, expires_at: exp, token_type: 'bearer', user };
   }
   let failWrites = false, failLoads = false, chain = Promise.resolve();
+  let failResearch = false;
+  const researchRequests = [];
   async function respond(event) {
     const { request, requestId } = event;
     const url = new URL(request.url);
@@ -105,6 +108,18 @@ function send(method, params = {}, sessionId) {
         else result = session(payload.email === userB.email ? userB : userA);
       } else if (url.pathname === '/auth/v1/logout') status = 204;
       else if (url.pathname === '/auth/v1/user') result = user;
+      else if (url.pathname === '/rest/v1/decision_research_responses') {
+        researchRequests.push({ payload, auth });
+        assert.equal(auth, 'Bearer test-anon-key', 'research must never carry the account token');
+        assert.equal(request.method, 'POST');
+        if (failResearch) { status = 503; result = { code: 'TEST_OUTAGE' }; }
+        else {
+          await database.exec('reset role; set role anon');
+          const keys = Object.keys(payload);
+          await database.query(`insert into decision_research_responses (${keys.join(',')}) values (${keys.map((_, i) => `$${i + 1}`).join(',')})`, Object.values(payload));
+          status = 204;
+        }
+      }
       else {
         if (!user) throw Object.assign(Error('Not authenticated'), { code: '42501' });
         await database.exec('reset role');
@@ -140,7 +155,7 @@ function send(method, params = {}, sessionId) {
     await until(`${selector} && !${selector}.disabled`);
     await evaluate(`${selector}.click()`);
   };
-  const createReceipt = async name => {
+  const beginResearch = async name => {
     await navigate('/analyze');
     await until(`document.querySelector('.product-local-note')?.textContent.includes('storage')`);
     await input('[name="name"]', name); await input('[name="price"]', '100');
@@ -148,6 +163,33 @@ function send(method, params = {}, sessionId) {
     await until(`document.querySelector('[name="uses"]')`);
     await input('[name="duration"]', '2'); await input('[name="uses"]', '5');
     await clickText('Continue to Purpose'); await clickText('Continue to Financial context'); await clickText('Generate True Cost Receipt');
+    await until(`document.querySelector('[data-decision-research] h2')?.textContent === 'Before seeing the full analysis'`);
+    assert.equal(await evaluate(`document.querySelector('.true-receipt')`), null, 'no result leaks before answering or skipping');
+    assert.equal(await evaluate(`document.querySelectorAll('[data-decision-research] input:checked').length`), 0, 'no default answers');
+  };
+  const answer = async (intent, confidence) => {
+    await click(`[data-decision-research] input[value="${intent}"]`);
+    await click(`[data-decision-research] input[value="${confidence}"]`);
+  };
+  const reveal = async () => {
+    await answer('yes', 5); await clickText('Continue');
+    await until(`document.querySelector('.true-receipt')`);
+    assert.equal(await evaluate(`document.activeElement.textContent`), 'True Cost Receipt');
+    assert.equal(await evaluate(`document.querySelector('[data-decision-research]')`), null, 'after prompt waits for visible totals');
+    await evaluate(`document.querySelector('.receipt-results').scrollIntoView({block:'center', behavior:'instant'})`);
+    await until(`document.querySelector('[data-decision-research] h2')?.textContent === 'After seeing the True Cost analysis'`);
+    assert.equal(await evaluate(`document.querySelectorAll('[data-decision-research] input:checked').length`), 0, 'after answers are independent');
+  };
+  const submitResearch = async () => {
+    await answer('no', 1);
+    await evaluate(`(() => { const button = document.querySelector('[data-decision-research] button[type="submit"]'); button.click(); button.click(); })()`);
+    await until(`document.querySelector('[data-decision-research][role="status"]')?.textContent.includes('has been saved')`);
+  };
+  const createReceipt = async name => {
+    await beginResearch(name); await reveal();
+    const count = researchRequests.length;
+    await submitResearch();
+    assert.equal(researchRequests.length, count + 1, 'double click sends one completed pair');
     await clickText('Save receipt to queue');
     await until(`document.querySelector('.product-status')?.textContent.includes('Receipt saved')`);
   };
@@ -218,6 +260,66 @@ function send(method, params = {}, sessionId) {
   await navigate('/purchases'); await until(`document.querySelector('.product-empty')`);
   assert.equal(await evaluate(`localStorage.getItem('decisionlab.products.v1')`), localBefore);
   console.log('PASS signup confirmation UI, invalid/valid signin, local/cloud separation, cloud Queue create/status/receipt/delete, Purchases review/reload/retry, signout, account isolation, cloud outage and Account mobile layout (mock Auth transport, real PostgreSQL/RLS).');
+
+  await signOut();
+  const pairedCount = researchRequests.length;
+  assert.equal(pairedCount, 3, 'anonymous and both signed-in accounts completed research');
+  for (const width of [320, 390, 1440]) {
+    await cdp('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: width < 768 });
+    await beginResearch('Optional research');
+    await evaluate(`document.querySelector('[data-decision-research]').scrollIntoView({block:'center', behavior:'instant'})`);
+    assert.equal(await evaluate(`document.documentElement.scrollWidth > innerWidth + 1`), false);
+    assert.ok(await evaluate(`[...document.querySelectorAll('[data-decision-research] label span')].every(e => e.getBoundingClientRect().height >= 44)`));
+    await screenshot(`research-before-${width}`);
+    await reveal();
+    await evaluate(`document.querySelector('[data-decision-research]').scrollIntoView({block:'center', behavior:'instant'})`);
+    assert.equal(await evaluate(`document.documentElement.scrollWidth > innerWidth + 1`), false);
+    await screenshot(`research-after-${width}`);
+    await clickText('Skip');
+    assert.equal(await evaluate(`document.querySelector('[data-decision-research]')`), null);
+  }
+  await beginResearch('Skipped before'); await clickText('Skip');
+  await until(`document.querySelector('.true-receipt')`);
+  await evaluate(`document.querySelector('.receipt-results').scrollIntoView({block:'center', behavior:'instant'})`);
+  await wait(150);
+  assert.equal(await evaluate(`document.querySelector('[data-decision-research]')`), null);
+  await beginResearch('Partial before'); await click('[data-decision-research] input[value="yes"]'); await clickText('Continue');
+  await until(`document.querySelector('.true-receipt')`);
+  assert.equal(await evaluate(`document.querySelector('[data-decision-research]')`), null);
+  await beginResearch('Refreshed before'); await navigate('/analyze');
+  assert.equal(await evaluate(`document.querySelector('[data-decision-research]')`), null);
+  await beginResearch('Refreshed after'); await reveal(); await navigate('/analyze');
+  assert.equal(await evaluate(`document.querySelector('[data-decision-research]')`), null);
+  await beginResearch('Edited assumptions'); await reveal(); await clickText('Edit assumptions');
+  await click('.product-steps button:nth-child(4)'); await clickText('Generate True Cost Receipt');
+  await until(`document.querySelector('.true-receipt')`);
+  assert.equal(await evaluate(`document.querySelector('[data-decision-research]')`), null);
+  assert.equal(researchRequests.length, pairedCount, 'skipped, refreshed and edited pairs never submit');
+  failResearch = true;
+  await beginResearch('Research unavailable'); await reveal(); await answer('maybe', 3); await clickText('Submit response');
+  await until(`document.querySelector('[data-decision-research][role="status"]')?.textContent.includes('couldn’t be saved')`);
+  assert.equal(await evaluate(`document.querySelector('.receipt-total .receipt-amount').textContent`), '$100.00');
+  await clickText('Save receipt to queue');
+  await until(`document.querySelector('.product-status')?.textContent.includes('Receipt saved')`);
+  assert.equal(researchRequests.length, pairedCount + 1, 'unavailable research does not retry');
+  failResearch = false;
+  await beginResearch('Navigation test'); await reveal(); await submitResearch();
+  const afterNavigation = researchRequests.length;
+  await click('.site-header a[href="/queue"]');
+  await until(`location.pathname === '/queue'`);
+  await evaluate('history.back()'); await until(`location.pathname === '/analyze'`); await wait(200);
+  await evaluate('history.forward()'); await until(`location.pathname === '/queue'`); await wait(200);
+  assert.equal(researchRequests.length, afterNavigation, 'back/forward navigation never resubmits');
+  const browserStorage = await evaluate(`JSON.stringify({ local: {...localStorage}, session: {...sessionStorage} })`);
+  assert.ok(!browserStorage.includes('decisionlab.research.volatile'), 'research client persists no auth storage');
+  for (const { payload } of researchRequests) assert.ok(!browserStorage.includes(payload.session_analysis_id), 'research UUID never enters either storage API');
+  await database.exec('reset role');
+  const researchRows = (await database.query('select * from decision_research_responses')).rows;
+  assert.equal(researchRows.length, pairedCount + 1);
+  assert.equal(new Set(researchRows.map(row => row.session_analysis_id)).size, researchRows.length);
+  assert.ok(researchRows.every(row => row.intention_changed && row.confidence_change === -4));
+  assert.ok(!JSON.stringify(researchRows).includes('Local record'));
+  console.log(`PASS research anonymous/authenticated pairs, pre-reveal boundary, observed totals, independent scales, duplicate clicks, skip/partial/refresh/edit/navigation, outage isolation, 320/390/1440px cards. Screenshots: ${artifacts}`);
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(async () => {
   clearTimeout(deadline); for (const { timeout } of pending.values()) clearTimeout(timeout); stop();
   await database?.close();
